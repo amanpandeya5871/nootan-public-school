@@ -420,6 +420,8 @@
     return;
   }
 
+  enableReveal();
+
   const io = new IntersectionObserver(
     function (entries) {
       entries.forEach(function (entry) {
@@ -429,14 +431,20 @@
         }
       });
     },
-    { threshold: 0.01, rootMargin: "0px 0px -8px 0px" }
+    { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
   );
-  nodes.forEach(function (el) {
-    if (inView(el)) {
-      el.classList.add("is-visible");
-      return;
-    }
-    io.observe(el);
+
+  function startReveals() {
+    nodes.forEach(function (el) {
+      if (inView(el)) {
+        el.classList.add("is-visible");
+        return;
+      }
+      io.observe(el);
+    });
+  }
+
+  window.requestAnimationFrame(function () {
+    window.requestAnimationFrame(startReveals);
   });
-  enableReveal();
 })();
