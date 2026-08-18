@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import csv
 import html
+import os
 import shutil
 from dataclasses import dataclass
 from datetime import datetime
@@ -1132,7 +1133,11 @@ def build_lang(lang: str) -> None:
 
 
 def write_publish_files() -> None:
-    (ROOT / "CNAME").write_text(f"{SITE_HOST}\n", encoding="utf-8")
+    cname = ROOT / "CNAME"
+    if os.environ.get("DEPLOY_CUSTOM_DOMAIN") == "1":
+        cname.write_text(f"{SITE_HOST}\n", encoding="utf-8")
+    elif cname.exists():
+        cname.unlink()
     (ROOT / ".nojekyll").write_text("", encoding="utf-8")
     (ROOT / "robots.txt").write_text(
         f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n",

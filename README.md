@@ -6,7 +6,13 @@ Public site for **Nootan Public School, Dharhara** (नूतन पब्लि
 
 https://www.nootanpublicschool.in/
 
-The public HTML is published from this folder (GitHub Pages). The working repo stays private; only these files go on the public website.
+The public HTML is published from this folder (GitHub Pages). Until GoDaddy DNS points `www.nootanpublicschool.in` at GitHub Pages, the site is also available at:
+
+https://aman-kumar-pandey.github.io/nootan-public-school/
+
+**Deploy:** merge to `main` runs `.github/workflows/pages.yml`. In the repo’s GitHub **Settings → Pages**, set **Source** to **GitHub Actions** (one-time). After DNS is live, set `DEPLOY_CUSTOM_DOMAIN=1` in that workflow before merging so the build writes `CNAME` again.
+
+The working repo stays private; only these files go on the public website.
 
 ## Preview
 
