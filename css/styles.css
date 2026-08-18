@@ -1686,36 +1686,36 @@ a.gallery-slot:focus-visible {
   }
 
   .identity {
-    padding: 8px 48px;
+    padding: 8px 64px 8px 12px;
     gap: 8px;
-    justify-content: center;
+    justify-content: flex-start;
   }
   .identity-leaf { max-width: min(72px, 12vw); opacity: 0.35; }
   .brand {
     max-width: none;
     gap: 8px;
-    justify-content: center;
-    text-align: center;
+    justify-content: flex-start;
+    text-align: left;
     min-width: 0;
   }
   .brand img {
     width: clamp(40px, 11vw, 64px);
     height: clamp(40px, 11vw, 64px);
   }
-  .brand-text { margin: 0 auto; text-align: center; min-width: 0; }
+  .brand-text { margin: 0; text-align: left; min-width: 0; }
   .brand-name {
     white-space: nowrap;
     font-size: clamp(1.22rem, 5.1vw, 2.4rem);
     font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1.1;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
+    margin-left: 0;
+    margin-right: 0;
+    text-align: left;
   }
   .brand-place {
     font-size: clamp(0.62rem, 2.4vw, 0.95rem);
-    text-align: center;
+    text-align: left;
     white-space: nowrap;
   }
   .nav-toggle { display: grid; place-items: center; }
@@ -1921,11 +1921,13 @@ a.gallery-slot:focus-visible {
     background: rgba(255, 255, 255, 0.48);
   }
   .identity {
-    padding: 8px 42px;
+    padding: 8px 64px 8px 10px;
     gap: 6px;
+    justify-content: flex-start;
   }
   .brand {
     flex-wrap: nowrap;
+    justify-content: flex-start;
   }
   .brand img {
     width: 34px;
@@ -1947,8 +1949,8 @@ a.gallery-slot:focus-visible {
 
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --page-x: 16px; }
-  .identity { padding: 6px 48px; }
-  .brand { justify-content: center; }
+  .identity { padding: 6px 64px 6px 12px; justify-content: flex-start; }
+  .brand { justify-content: flex-start; }
   .brand img { width: 44px; height: 44px; }
   .brand-name {
     white-space: nowrap;
