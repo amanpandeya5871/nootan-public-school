@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="FACILITIES">
+  <circle cx="100" cy="100" r="99" fill="#c9a227"/>
+  <circle cx="100" cy="100" r="93" fill="#0a3d2c"/>
+  <circle cx="100" cy="100" r="68" fill="#c9a227"/>
+  <circle cx="100" cy="100" r="63" fill="#f7faf8"/>
+  <defs>
+    <path id="arc-top-facilities" d="M 38 100 A 62 62 0 0 1 162 100"/>
+    <path id="arc-bot-facilities" d="M 162 100 A 62 62 0 0 1 38 100"/>
+  </defs>
+  <text fill="#ffffff" font-size="13" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-weight="700" letter-spacing="2">
+    <textPath href="#arc-top-facilities" startOffset="50%" text-anchor="middle">FACILITIES</textPath>
+  </text>
+  <text fill="#ffffff" font-size="12" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-weight="700" letter-spacing="4">
+    <textPath href="#arc-bot-facilities" startOffset="50%" text-anchor="middle">NPS</textPath>
+  </text>
+  
+      <rect x="70" y="96" width="60" height="36" fill="none" stroke="#0f766e" stroke-width="4"/>
+      <path d="M64 96 H136 L100 70 Z" fill="none" stroke="#c9a227" stroke-width="4" stroke-linejoin="round"/>
+      <rect x="92" y="108" width="16" height="24" fill="#0f766e"/>
+    
+</svg>

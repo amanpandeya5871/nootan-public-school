@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="ABOUT">
+  <circle cx="100" cy="100" r="99" fill="#c9a227"/>
+  <circle cx="100" cy="100" r="93" fill="#0a3d2c"/>
+  <circle cx="100" cy="100" r="68" fill="#c9a227"/>
+  <circle cx="100" cy="100" r="63" fill="#f7faf8"/>
+  <defs>
+    <path id="arc-top-about" d="M 38 100 A 62 62 0 0 1 162 100"/>
+    <path id="arc-bot-about" d="M 162 100 A 62 62 0 0 1 38 100"/>
+  </defs>
+  <text fill="#ffffff" font-size="13" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-weight="700" letter-spacing="2">
+    <textPath href="#arc-top-about" startOffset="50%" text-anchor="middle">ABOUT</textPath>
+  </text>
+  <text fill="#ffffff" font-size="12" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-weight="700" letter-spacing="4">
+    <textPath href="#arc-bot-about" startOffset="50%" text-anchor="middle">NPS</textPath>
+  </text>
+  
+      <rect x="74" y="94" width="52" height="38" fill="none" stroke="#0f766e" stroke-width="4"/>
+      <path d="M68 94 H132 L100 70 Z" fill="none" stroke="#c9a227" stroke-width="4" stroke-linejoin="round"/>
+      <rect x="94" y="110" width="12" height="22" fill="#0f766e"/>
+    
+</svg>

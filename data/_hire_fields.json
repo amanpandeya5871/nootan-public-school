@@ -1,0 +1,348 @@
+{
+  "final_url": "https://docs.google.com/forms/d/e/1FAIpQLSeUXc-AzPauasCMLob119CrkMJfpQbPSkTx9KkaNV-sW8bwtA/viewform?usp=send_form",
+  "formid": "1FAIpQLSeUXc-AzPauasCMLob119CrkMJfpQbPSkTx9KkaNV-sW8bwtA",
+  "questions": [
+    {
+      "type": 0,
+      "entry": [
+        1427881240
+      ],
+      "title": "Full Name / पूरा नाम",
+      "options": [],
+      "raw4": [
+        [
+          1427881240,
+          null,
+          1
+        ]
+      ]
+    },
+    {
+      "type": 0,
+      "entry": [
+        1761947904
+      ],
+      "title": "Place/Address / पता",
+      "options": [],
+      "raw4": [
+        [
+          1761947904,
+          null,
+          1
+        ]
+      ]
+    },
+    {
+      "type": 0,
+      "entry": [
+        377564811
+      ],
+      "title": "Age / आयु",
+      "options": [],
+      "raw4": [
+        [
+          377564811,
+          null,
+          0
+        ]
+      ]
+    },
+    {
+      "type": 2,
+      "entry": [
+        1911407103
+      ],
+      "title": "Gender / लिंग",
+      "options": [
+        "Male / पुरुष",
+        "Female / महिला",
+        "Other / अन्य"
+      ],
+      "raw4": [
+        [
+          1911407103,
+          [
+            [
+              "Male / पुरुष",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Female / महिला",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Other / अन्य",
+              null,
+              null,
+              null,
+              0
+            ]
+          ],
+          1,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0
+        ]
+      ]
+    },
+    {
+      "type": 3,
+      "entry": [
+        963297648
+      ],
+      "title": "Highest Education Qualification / उच्चतम शैक्षणिक योग्यता",
+      "options": [
+        "Bachelor of Education (B.Ed)",
+        "Master of Education (M.Ed)",
+        "Post Graduate (PG)",
+        "Graduate (UG)",
+        "Other / अन्य"
+      ],
+      "raw4": [
+        [
+          963297648,
+          [
+            [
+              "Bachelor of Education (B.Ed)",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Master of Education (M.Ed)",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Post Graduate (PG)",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Graduate (UG)",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Other / अन्य",
+              null,
+              null,
+              null,
+              0
+            ]
+          ],
+          1,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0
+        ]
+      ]
+    },
+    {
+      "type": 0,
+      "entry": [
+        1127572244
+      ],
+      "title": "Last Workplace / पिछला कार्यस्थल",
+      "options": [],
+      "raw4": [
+        [
+          1127572244,
+          null,
+          0
+        ]
+      ]
+    },
+    {
+      "type": 0,
+      "entry": [
+        939638821
+      ],
+      "title": "Expected Salary (Monthly) / अपेक्षित वेतन (मासिक)",
+      "options": [],
+      "raw4": [
+        [
+          939638821,
+          null,
+          0
+        ]
+      ]
+    },
+    {
+      "type": 4,
+      "entry": [
+        511383120
+      ],
+      "title": "Subjects you can teach / आप कौन से विषय पढ़ा सकते हैं",
+      "options": [
+        "Mathematics / गणित",
+        "Science / विज्ञान",
+        "English / अंग्रेजी",
+        "Hindi / हिंदी",
+        "Social Studies / सामाजिक अध्ययन",
+        "Computer / कंप्यूटर",
+        "Arts & Physical Education / कला और शारीरिक शिक्षा",
+        "EVS",
+        ""
+      ],
+      "raw4": [
+        [
+          511383120,
+          [
+            [
+              "Mathematics / गणित",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Science / विज्ञान",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "English / अंग्रेजी",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Hindi / हिंदी",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Social Studies / सामाजिक अध्ययन",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Computer / कंप्यूटर",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Arts & Physical Education / कला और शारीरिक शिक्षा",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "EVS",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "",
+              null,
+              null,
+              null,
+              1
+            ]
+          ],
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0
+        ]
+      ]
+    },
+    {
+      "type": 4,
+      "entry": [
+        1043269120
+      ],
+      "title": "Classes you are qualified to teach / आप किन कक्षाओं को पढ़ाने के लिए योग्य हैं",
+      "options": [
+        "Pre-Primary (Nursery-KG)",
+        "Primary (1-5)",
+        "Middle School (6-8)"
+      ],
+      "raw4": [
+        [
+          1043269120,
+          [
+            [
+              "Pre-Primary (Nursery-KG)",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Primary (1-5)",
+              null,
+              null,
+              null,
+              0
+            ],
+            [
+              "Middle School (6-8)",
+              null,
+              null,
+              null,
+              0
+            ]
+          ],
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0
+        ]
+      ]
+    },
+    {
+      "type": 1,
+      "entry": [
+        472847390
+      ],
+      "title": "Please provide a link to a sample lesson plan or teaching video / कृपया एक नमूना पाठ योजना या शिक्षण वीडियो का लिंक प्रदान करें",
+      "options": [],
+      "raw4": [
+        [
+          472847390,
+          null,
+          0
+        ]
+      ]
+    }
+  ]
+}
