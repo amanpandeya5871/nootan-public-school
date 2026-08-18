@@ -82,7 +82,8 @@
       list.style.width = "";
       return;
     }
-    var width = Math.round(lastLetterRight(name) - list.getBoundingClientRect().left);
+    var extra = bar.querySelectorAll(".sub-toggle").length * 20;
+    var width = Math.round(lastLetterRight(name) - list.getBoundingClientRect().left + extra);
     if (width > 80) list.style.width = width + "px";
   }
   function scheduleNavAlign() {
