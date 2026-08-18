@@ -1688,36 +1688,36 @@ a.gallery-slot:focus-visible {
   }
 
   .identity {
-    padding: 8px 64px 8px 12px;
+    padding: 8px 56px;
     gap: 8px;
-    justify-content: flex-start;
+    justify-content: center;
   }
   .identity-leaf { max-width: min(72px, 12vw); opacity: 0.35; }
   .brand {
     max-width: none;
     gap: 8px;
-    justify-content: flex-start;
-    text-align: left;
+    justify-content: center;
+    text-align: center;
     min-width: 0;
   }
   .brand img {
     width: clamp(40px, 11vw, 64px);
     height: clamp(40px, 11vw, 64px);
   }
-  .brand-text { margin: 0; text-align: left; min-width: 0; }
+  .brand-text { margin: 0 auto; text-align: center; min-width: 0; }
   .brand-name {
     white-space: nowrap;
     font-size: clamp(1.22rem, 5.1vw, 2.4rem);
     font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1.1;
-    margin-left: 0;
-    margin-right: 0;
-    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
   }
   .brand-place {
     font-size: clamp(0.62rem, 2.4vw, 0.95rem);
-    text-align: left;
+    text-align: center;
     white-space: nowrap;
   }
   .nav-toggle { display: grid; place-items: center; }
@@ -1923,17 +1923,22 @@ a.gallery-slot:focus-visible {
     background: rgba(255, 255, 255, 0.48);
   }
   .identity {
-    padding: 8px 64px 8px 10px;
-    gap: 6px;
-    justify-content: flex-start;
+    padding: 8px 58px 8px 28px;
+    gap: 8px;
+    justify-content: center;
   }
   .brand {
     flex-wrap: nowrap;
-    justify-content: flex-start;
+    justify-content: center;
+    transform: translateX(-8px);
   }
   .brand img {
-    width: 34px;
-    height: 34px;
+    width: 48px;
+    height: 48px;
+  }
+  .brand-text {
+    margin: 0 auto;
+    text-align: center;
   }
   .brand-name {
     white-space: nowrap;
@@ -1941,18 +1946,22 @@ a.gallery-slot:focus-visible {
     font-weight: 700;
     letter-spacing: -0.035em;
     width: max-content;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
     line-height: 1.08;
   }
   .brand-place {
     white-space: nowrap;
     font-size: min(2.8vw, 0.78rem);
+    text-align: center;
   }
 }
 
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --page-x: 16px; }
-  .identity { padding: 6px 64px 6px 12px; justify-content: flex-start; }
-  .brand { justify-content: flex-start; }
+  .identity { padding: 6px 56px; justify-content: center; }
+  .brand { justify-content: center; transform: none; }
   .brand img { width: 44px; height: 44px; }
   .brand-name {
     white-space: nowrap;
