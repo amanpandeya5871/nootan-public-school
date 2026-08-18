@@ -1854,6 +1854,46 @@ a.gallery-slot:focus-visible {
   }
 }
 
+@media (orientation: portrait) and (max-width: 900px) {
+  .page-flora {
+    display: block;
+  }
+  .page-flora-leaf {
+    display: block;
+    opacity: 0.34;
+    width: 220vmax;
+    height: 220vmax;
+    min-width: 220vmax;
+    min-height: 220vmax;
+  }
+  .cards-block,
+  .page,
+  main .story {
+    background: rgba(255, 255, 255, 0.48);
+  }
+  .identity {
+    padding: 8px 42px;
+    gap: 6px;
+  }
+  .brand {
+    flex-wrap: nowrap;
+  }
+  .brand img {
+    width: 34px;
+    height: 34px;
+  }
+  .brand-name {
+    white-space: nowrap;
+    font-size: min(4.4vw, 1.15rem);
+    width: max-content;
+    line-height: 1.1;
+  }
+  .brand-place {
+    white-space: nowrap;
+    font-size: min(2.8vw, 0.78rem);
+  }
+}
+
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --page-x: 16px; }
   .identity { padding: 6px 48px; }
