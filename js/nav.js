@@ -267,6 +267,18 @@
       if (repeat.indexOf(name) >= 0) return;
       var entryId = config.fields[name];
       var value = fieldValue(form, name);
+      if (name === "query") {
+        var extras = [];
+        var age = fieldValue(form, "age");
+        var address = fieldValue(form, "address");
+        if (age) extras.push("Date of birth / Age: " + age);
+        if (address) extras.push("Address: " + address);
+        if (value) extras.push(value);
+        value = extras.join("\n");
+      }
+      if (name === "mother" && !value) {
+        value = fieldValue(form, "father");
+      }
       if (value) body.append("entry." + entryId, value);
     });
 
@@ -289,6 +301,17 @@
     });
   }
 
+  document.querySelectorAll(".faq").forEach(function (root) {
+    root.querySelectorAll("details").forEach(function (item) {
+      item.addEventListener("toggle", function () {
+        if (!item.open) return;
+        root.querySelectorAll("details").forEach(function (other) {
+          if (other !== item) other.removeAttribute("open");
+        });
+      });
+    });
+  });
+
   document.querySelectorAll("[data-gform]").forEach(function (form) {
     var key = form.getAttribute("data-gform") || "inquiry";
     var config = GFORMS[key];
@@ -302,7 +325,44 @@
     });
   });
 
-  function startCarousel(root, itemSelector) {
+  document.querySelectorAll("[data-notice-board]").forEach(function (board) {
+    var form = board.querySelector("[data-notice-filters]");
+    if (!form) return;
+    var classSel = form.querySelector('[name="notice-class"]');
+    var catSel = form.querySelector('[name="notice-category"]');
+    var search = form.querySelector('[name="notice-search"]');
+    var rows = Array.from(board.querySelectorAll("tbody tr[data-notice]"));
+    var empty = board.querySelector(".notice-filter-empty");
+    var table = board.querySelector(".hours-table-wrap");
+
+    function applyNoticeFilter() {
+      var cls = classSel ? classSel.value : "all";
+      var cat = catSel ? catSel.value : "all";
+      var q = search ? String(search.value || "").trim().toLowerCase() : "";
+      var shown = 0;
+      rows.forEach(function (row) {
+        var ok = true;
+        var classes = String(row.getAttribute("data-classes") || "all").split(/[\s,]+/);
+        if (cls && cls !== "all" && classes.indexOf("all") < 0 && classes.indexOf(cls) < 0) ok = false;
+        if (cat && cat !== "all" && row.getAttribute("data-category") !== cat) ok = false;
+        if (q && String(row.getAttribute("data-search") || "").indexOf(q) < 0) ok = false;
+        row.hidden = !ok;
+        if (ok) shown += 1;
+      });
+      if (empty) empty.hidden = shown > 0;
+      if (table) table.hidden = shown === 0;
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+    });
+    ["change", "input"].forEach(function (evt) {
+      form.addEventListener(evt, applyNoticeFilter);
+    });
+    applyNoticeFilter();
+  });
+
+  function startCarousel(root, itemSelector, delayMs) {
     if (!root) return;
     const items = Array.from(root.querySelectorAll(itemSelector));
     if (!items.length) return;
@@ -320,11 +380,14 @@
       items.forEach(function (item, idx) {
         item.classList.toggle("is-active", idx === index);
       });
-    }, 4000);
+    }, delayMs || 4000);
   }
 
-  startCarousel(document.querySelector("[data-quote-carousel]"), ".hero-quote");
-  startCarousel(document.querySelector("[data-topper-carousel]"), ".topper-card");
+  startCarousel(document.querySelector("[data-quote-carousel]"), ".hero-quote", 4000);
+  startCarousel(document.querySelector("[data-topper-carousel]"), ".topper-card", 6000);
+  document.querySelectorAll("[data-gallery-carousel]").forEach(function (root) {
+    startCarousel(root, ".gallery-slide", 4000);
+  });
 
   const extra = document.querySelectorAll(
     "main .story h2, main .story p, main .story a.learn-more, main .page h2, main .page p, main .page li, main .page details, main .page form, main .page dl, main .gallery-slot, main .enquire h2, main .enquire p, main .section-title, main .section-label"

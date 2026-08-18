@@ -162,6 +162,8 @@ def load_notices() -> list[dict[str, str]]:
                 "title": (row.get("title") or "").strip(),
                 "summary": (row.get("summary") or "").strip(),
                 "file": file_name,
+                "category": (row.get("category") or "administrative").strip() or "administrative",
+                "classes": (row.get("classes") or "all").strip() or "all",
             }
         )
     items.sort(key=lambda item: item["date"], reverse=True)
@@ -192,6 +194,100 @@ def notice_cards(site: Site, items: list[dict[str, str]]) -> str:
           </a>"""
         )
     return "\n".join(bits) if bits else f'          <p class="prose">{site.tx("no_notices")}</p>'
+
+
+def notice_category_label(site: Site, category: str) -> str:
+    key = f"notices_cat_{category}"
+    try:
+        return site.tx(key)
+    except KeyError:
+        return category
+
+
+def notice_board_html(site: Site, items: list[dict[str, str]], *, filters: bool = False) -> str:
+    x = site.tx
+    rows: list[str] = []
+    for item in items:
+        href = site.href(f"notice-{slug_from_file(item['file'])}.html")
+        title = notice_title(site, item)
+        summary = notice_summary(site, item)
+        category = item.get("category") or "administrative"
+        classes = item.get("classes") or "all"
+        cat_label = notice_category_label(site, category)
+        search = " ".join((title, summary, cat_label)).lower()
+        rows.append(
+            f"""            <tr data-notice data-category="{html.escape(category, quote=True)}" data-classes="{html.escape(classes, quote=True)}" data-search="{html.escape(search, quote=True)}">
+              <td>
+                <span class="notice-status">{x("notices_status_active")}</span>
+                <time datetime="{html.escape(item["date"], quote=True)}">{html.escape(format_date(item["date"]))}</time>
+              </td>
+              <td>{html.escape(cat_label)}</td>
+              <td>
+                <a href="{html.escape(href, quote=True)}">{html.escape(title)}</a>
+                <span class="notice-table-summary">{html.escape(summary)}</span>
+              </td>
+              <td><a class="notice-action" href="{html.escape(href, quote=True)}">{x("notices_view")}</a></td>
+            </tr>"""
+        )
+    body = "\n".join(rows) if rows else f'            <tr><td colspan="4">{x("no_notices")}</td></tr>'
+    filter_bar = ""
+    if filters:
+        class_opts = "\n".join(
+            f'              <option value="{html.escape(value, quote=True)}">{x(key)}</option>'
+            for value, key in (
+                ("all", "notices_filter_all"),
+                ("play", "form_grade_pre"),
+                ("seedling", "form_grade_seedling"),
+                ("sapling", "form_grade_sapling"),
+                ("adv", "form_grade_adv"),
+                ("1-8", "notices_class_18"),
+            )
+        )
+        cat_opts = "\n".join(
+            f'              <option value="{html.escape(value, quote=True)}">{x(key)}</option>'
+            for value, key in (
+                ("all", "notices_filter_all"),
+                ("academic", "notices_cat_academic"),
+                ("holidays", "notices_cat_holidays"),
+                ("events", "notices_cat_events"),
+                ("administrative", "notices_cat_administrative"),
+            )
+        )
+        filter_bar = f"""        <form class="notice-filters" data-notice-filters>
+          <label>{x("notices_filter_class")}
+            <select name="notice-class">
+{class_opts}
+            </select>
+          </label>
+          <label>{x("notices_filter_category")}
+            <select name="notice-category">
+{cat_opts}
+            </select>
+          </label>
+          <label class="notice-filters-search">{x("notices_filter_search")}
+            <input name="notice-search" type="search" placeholder="{html.escape(x("notices_filter_search_ph"), quote=True)}" />
+          </label>
+        </form>
+        <p class="notice-filter-empty" hidden>{x("notices_none_filter")}</p>
+"""
+    return f"""        <div class="notice-board" data-notice-board>
+{filter_bar}        <div class="hours-table-wrap">
+          <table class="hours-table notice-table">
+            <thead>
+              <tr>
+                <th>{x("notices_col_status")}</th>
+                <th>{x("notices_col_category")}</th>
+                <th>{x("notices_col_title")}</th>
+                <th>{x("notices_col_action")}</th>
+              </tr>
+            </thead>
+            <tbody>
+{body}
+            </tbody>
+          </table>
+        </div>
+        </div>
+"""
 
 
 def crumbs(site: Site, *parts: tuple[str, str]) -> str:
@@ -258,7 +354,7 @@ def head(site: Site, title: str, meta: str) -> str:
 {preloads}  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="{FONTS}" rel="stylesheet" />
-  <link rel="stylesheet" href="{html.escape(site.asset("css/styles.css"), quote=True)}?v=20260818j" />
+  <link rel="stylesheet" href="{html.escape(site.asset("css/styles.css"), quote=True)}?v=20260818ab" />
 </head>
 <body>
   <a class="skip" href="#main">{html.escape(site.tx("skip"))}</a>
@@ -270,7 +366,7 @@ def head(site: Site, title: str, meta: str) -> str:
 
 def nav(site: Site, current: str) -> str:
     def cur(name: str) -> str:
-        return ' aria-current="page"' if name == current else ""
+        return ' aria-current="page"' if name == current or (name == "notices" and current == "notices-archive") else ""
 
     a = site.asset
     h = site.href
@@ -316,12 +412,26 @@ def nav(site: Site, current: str) -> str:
           <a href="{h("admissions.html")}"{cur("admissions")}>{x("nav_admissions")}</a>
           <button type="button" class="sub-toggle" aria-expanded="false" aria-label="{html.escape(x("open_sub"), quote=True)}"></button>
           <ul class="sub">
-            <li><a href="{h("admissions.html")}">{x("nav_enquire")}</a></li>
+            <li><a href="{h("admissions.html")}#enquiry">{x("nav_enquire")}</a></li>
             <li><a href="{h("faq.html")}"{cur("faq")}>{x("nav_faq")}</a></li>
           </ul>
         </li>
-        <li><a href="{h("results.html")}"{cur("results")}>{x("nav_results")}</a></li>
-        <li><a href="{h("notices.html")}"{cur("notices")}>{x("nav_notices")}</a></li>
+        <li class="has-sub">
+          <a href="{h("results.html")}"{cur("results")}>{x("nav_results")}</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-label="{html.escape(x("open_sub"), quote=True)}"></button>
+          <ul class="sub">
+            <li><a href="{h("results.html")}">{x("nav_results_assess")}</a></li>
+            <li><a href="{h("results.html")}#lookup">{x("crumb_marksheet")}</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <a href="{h("notices.html")}"{cur("notices")}>{x("nav_notices")}</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-label="{html.escape(x("open_sub"), quote=True)}"></button>
+          <ul class="sub">
+            <li><a href="{h("notices.html")}">{x("nav_notices_board")}</a></li>
+            <li><a href="{h("notices-archive.html")}"{cur("notices-archive")}>{x("nav_notices_archive")}</a></li>
+          </ul>
+        </li>
         <li><a href="{h("gallery.html")}"{cur("gallery")}>{x("nav_gallery")}</a></li>
         <li><a href="{h("careers.html")}"{cur("careers")}>{x("nav_careers")}</a></li>
         <li><a href="{h("contact.html")}"{cur("contact")}>{x("nav_contact")}</a></li>
@@ -417,7 +527,7 @@ def foot(site: Site) -> str:
     </div>
     <p class="legal">{x("legal")}</p>
   </footer>
-  <script src="{a("js/nav.js")}?v=20260818j"></script>
+  <script src="{a("js/nav.js")}?v=20260818s"></script>
 </body>
 </html>
 """
@@ -442,8 +552,9 @@ def banner(heading: str) -> str:
 """
 
 
-def story(heading: str, body: str) -> str:
-    return f"""    <section class="story">
+def story(heading: str, body: str, *, section_id: str = "") -> str:
+    id_attr = f' id="{html.escape(section_id, quote=True)}"' if section_id else ""
+    return f"""    <section class="story"{id_attr}>
       <h2>{heading}</h2>
       <div>
 {body.rstrip()}
@@ -481,21 +592,64 @@ def album_page(slug: str) -> str:
     return f"gallery-{slug}.html"
 
 
-def gallery_index_tiles(site: Site) -> str:
-    tiles = []
-    for slug, label_key in GALLERY_ALBUMS:
+def gallery_slide_visual(site: Site, slug: str, photos: list[Path], *, eager: bool) -> str:
+    if not photos:
+        return '              <div class="gallery-slide-visual gallery-slide-ph" aria-hidden="true"></div>'
+    src = html.escape(site.asset(f"gallery/{slug}/{photos[0].name}"), quote=True)
+    loading = "" if eager else ' loading="lazy"'
+    return (
+        f'              <img class="gallery-slide-visual" src="{src}" alt="" '
+        f'decoding="async"{loading} />'
+    )
+
+
+def gallery_index_html(site: Site) -> str:
+    slides: list[str] = []
+    jumps: list[str] = []
+    for index, (slug, label_key) in enumerate(GALLERY_ALBUMS):
         photos = album_photos(slug)
         label = html.escape(site.tx(label_key))
         href = html.escape(site.href(album_page(slug)), quote=True)
-        if photos:
-            src = html.escape(site.asset(f"gallery/{slug}/{photos[0].name}"), quote=True)
-            tiles.append(
-                f'          <a class="gallery-slot has-photo" href="{href}">'
-                f'<img src="{src}" alt="" decoding="async" loading="lazy" /><span>{label}</span></a>'
-            )
-        else:
-            tiles.append(f'          <a class="gallery-slot" href="{href}">{label}</a>')
-    return "\n".join(tiles)
+        active = " is-active" if index == 0 else ""
+        visual = gallery_slide_visual(site, slug, photos, eager=index == 0)
+        slides.append(
+            f"""            <a class="gallery-slide{active}" href="{href}">
+{visual}
+              <div class="gallery-slide-copy">
+                <p class="gallery-slide-kicker">{html.escape(site.tx("nav_gallery"))}</p>
+                <h3>{label}</h3>
+                <p class="gallery-slide-more">{html.escape(site.tx("gal_view"))}</p>
+              </div>
+            </a>"""
+        )
+        jumps.append(f'          <a href="{href}">{label}</a>')
+    return (
+        '        <div class="gallery-carousel" data-gallery-carousel>\n'
+        + "\n".join(slides)
+        + "\n        </div>\n"
+        + f'        <nav class="gallery-jump" aria-label="{html.escape(site.tx("gal_albums"), quote=True)}">\n'
+        + "\n".join(jumps)
+        + "\n        </nav>\n"
+    )
+
+
+def album_carousel_html(site: Site, slug: str, heading: str, photos: list[Path]) -> str:
+    slides: list[str] = []
+    for index, path in enumerate(photos):
+        active = " is-active" if index == 0 else ""
+        src = html.escape(site.asset(f"gallery/{slug}/{path.name}"), quote=True)
+        loading = "" if index == 0 else ' loading="lazy"'
+        alt = html.escape(heading, quote=True)
+        slides.append(
+            f"""            <figure class="gallery-slide gallery-slide-photo{active}">
+              <img class="gallery-slide-visual" src="{src}" alt="{alt}" decoding="async"{loading} />
+            </figure>"""
+        )
+    return (
+        '        <div class="gallery-carousel" data-gallery-carousel>\n'
+        + "\n".join(slides)
+        + "\n        </div>\n"
+    )
 
 
 def write_gallery_albums(site: Site) -> None:
@@ -506,14 +660,7 @@ def write_gallery_albums(site: Site) -> None:
         heading = site.tx(label_key)
         photos = album_photos(slug)
         if photos:
-            figures = "\n".join(
-                (
-                    f'          <a class="gallery-shot" href="{html.escape(site.asset(f"gallery/{slug}/{path.name}"), quote=True)}">'
-                    f'<img src="{html.escape(site.asset(f"gallery/{slug}/{path.name}"), quote=True)}" alt="{html.escape(heading, quote=True)}" decoding="async" loading="lazy" /></a>'
-                )
-                for path in photos
-            )
-            body = f'        <div class="gallery-album">\n{figures}\n        </div>\n'
+            body = album_carousel_html(site, slug, heading, photos)
         else:
             body = f'        <p class="gallery-empty">{html.escape(site.tx("gal_empty"))}</p>\n'
         main = (
@@ -717,9 +864,70 @@ def hiring_form_html(site: Site) -> str:
             <input name="sample" type="url" inputmode="url" placeholder="https://" />
           </label>
           <p class="form-required-key"><span class="form-req">*</span> : {x("form_required_meaning")}</p>
-          <button type="submit">{x("form_submit")}</button>
+          <button type="submit">{x("careers_submit")}</button>
         </form>
         <p class="form-thanks" hidden role="status">{x("careers_thanks")}</p>
+        </div>"""
+
+
+def inquiry_form_html(site: Site) -> str:
+    x = site.tx
+    gform_lang = "Hindi" if site.lang == "hi" else "English"
+    grade_options = "\n".join(
+        f'              <option value="{html.escape(value, quote=True)}">{x(key)}</option>'
+        for value, key in (
+            ("Pre-Nursery", "form_grade_pre"),
+            ("Seedling (Nursery)", "form_grade_seedling"),
+            ("Sapling (LKG)", "form_grade_sapling"),
+            ("Advance Sapling (UKG)", "form_grade_adv"),
+            ("Class 1", "form_grade_1"),
+            ("Class 2", "form_grade_2"),
+            ("Class 3", "form_grade_3"),
+            ("Class 4", "form_grade_4"),
+            ("Class 5", "form_grade_5"),
+            ("Class 6", "form_grade_6"),
+            ("Class 7", "form_grade_7"),
+            ("Class 8", "form_grade_8"),
+        )
+    )
+    return f"""        <div class="form-block">
+        <form class="form" data-gform="inquiry">
+          <input type="hidden" name="language" value="{gform_lang}" />
+          <input type="hidden" name="inquiry" value="Admission Process / प्रवेश प्रक्रिया" />
+          <p class="form-group-title form-wide">{x("form_student_group")}</p>
+          <label class="form-wide">{req_label(site, "form_child")}
+            <input name="student" type="text" autocomplete="name" required />
+          </label>
+          <label>{x("form_age")}
+            <input name="age" type="text" />
+          </label>
+          <label>{req_label(site, "form_grade")}
+            <select name="grade" required>
+              <option value="">{x("form_choose")}</option>
+{grade_options}
+            </select>
+          </label>
+          <p class="form-group-title form-wide">{x("form_parent_group")}</p>
+          <label class="form-wide">{req_label(site, "form_guardian")}
+            <input name="father" type="text" autocomplete="name" required />
+          </label>
+          <label>{req_label(site, "form_phone")}
+            <input name="phone" type="tel" autocomplete="tel" inputmode="tel" required />
+          </label>
+          <label>{x("form_email")}
+            <input name="email" type="email" autocomplete="email" />
+          </label>
+          <label class="form-wide">{x("form_address")}
+            <input name="address" type="text" autocomplete="street-address" />
+          </label>
+          <p class="form-group-title form-wide">{x("form_message_group")}</p>
+          <label class="form-wide">{x("form_query_enquiry")}
+            <textarea name="query"></textarea>
+          </label>
+          <p class="form-required-key"><span class="form-req">*</span> : {x("form_required_meaning")}</p>
+          <button type="submit">{x("form_submit_enquiry")}</button>
+        </form>
+        <p class="form-thanks" hidden role="status">{x("form_thanks")}</p>
         </div>"""
 
 
@@ -730,79 +938,80 @@ def build_lang(lang: str) -> None:
     a = site.asset
     items = load_notices()
     home_cards = notice_cards(site, items[:3])
-    all_cards = notice_cards(site, items)
 
     index_main = f"""  <main id="main">
-    <section class="hero">
+    <section class="hero hero-welcome">
       <div class="quote-carousel" data-quote-carousel>
           <div class="quote-track">
 {quotes_html(site)}
           </div>
         </div>
+      <div class="hero-inner wrap">
+        <h1>{x("home_hero_title")}</h1>
+        <p class="hero-lead">{x("home_hero_sub")}</p>
+        <div class="hero-actions">
+          <a class="admit-cta" href="{h("admissions.html")}">{x("home_cta_admissions")}</a>
+          <a class="admit-cta admit-cta-ghost" href="{h("gallery.html")}">{x("home_cta_campus")}</a>
+        </div>
+      </div>
     </section>
 
-    <section class="wrap story">
+    <section class="story">
       <h2>{x("home_about")}</h2>
       <div>
+        <blockquote class="welcome-quote">
+          <p>“{x("home_welcome_quote")}”</p>
+        </blockquote>
         <p>{x("home_about_p1")}</p>
         <p>{x("home_about_p2")}</p>
-        <p>{x("home_about_p3")}</p>
-        <p>{x("home_about_p4")}</p>
         <a class="learn-more" href="{h("about.html")}">{x("home_about_more")}</a>
       </div>
     </section>
 
     <section class="cards-block reveal">
       <div class="wrap">
-        <p class="section-label">{x("home_explore")}</p>
-        <h2 class="section-title">{x("home_start")}</h2>
-        <div class="cards">
-          <a class="card" href="{h("academics.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-academics.webp")}" alt="" width="112" height="112" decoding="async" /></div>
-            <h3>{x("nav_academics")}</h3>
-            <p>{x("card_academics")}</p>
-          </a>
-          <a class="card" href="{h("results.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-academics.webp")}" alt="" width="112" height="112" decoding="async" /></div>
-            <h3>{x("nav_results")}</h3>
-            <p>{x("card_results")}</p>
-          </a>
-          <a class="card" href="{h("admissions.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-admissions.webp")}" alt="" width="112" height="112" decoding="async" /></div>
-            <h3>{x("nav_admissions")}</h3>
-            <p>{x("card_admissions")}</p>
-          </a>
-          <a class="card" href="{h("contact.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-contact.webp")}" alt="" width="112" height="112" decoding="async" /></div>
-            <h3>{x("nav_contact")}</h3>
-            <p>{x("card_contact")}</p>
-          </a>
-          <a class="card" href="{h("facilities.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-facilities.webp")}" alt="" width="112" height="112" decoding="async" /></div>
-            <h3>{x("nav_facilities")}</h3>
-            <p>{x("card_facilities")}</p>
-          </a>
-          <a class="card" href="{h("school-life.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-school-life.webp")}" alt="" width="112" height="112" decoding="async" /></div>
-            <h3>{x("nav_life")}</h3>
-            <p>{x("card_life")}</p>
-          </a>
-          <a class="card" href="{h("notices.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-notices.webp")}" alt="" width="112" height="112" decoding="async" /></div>
-            <h3>{x("nav_notices")}</h3>
-            <p>{x("card_notices")}</p>
-          </a>
+        <p class="section-label">{x("home_pillars_label")}</p>
+        <h2 class="section-title">{x("home_pillars_title")}</h2>
+        <p class="section-caption">{x("home_pillars_caption")}</p>
+        <div class="cards cards-4">
+          <article class="card card-plain">
+            <h3>{x("home_pillar_1_title")}</h3>
+            <p>{x("home_pillar_1_text")}</p>
+          </article>
+          <article class="card card-plain">
+            <h3>{x("home_pillar_2_title")}</h3>
+            <p>{x("home_pillar_2_text")}</p>
+          </article>
+          <article class="card card-plain">
+            <h3>{x("home_pillar_3_title")}</h3>
+            <p>{x("home_pillar_3_text")}</p>
+          </article>
+          <article class="card card-plain">
+            <h3>{x("home_pillar_4_title")}</h3>
+            <p>{x("home_pillar_4_text")}</p>
+          </article>
         </div>
       </div>
     </section>
 
-    <section class="wrap story">
-      <h2>{x("home_campus")}</h2>
-      <div>
-        <p>{x("home_campus_p1")}</p>
-        <p>{x("home_campus_p2")}</p>
-        <a class="learn-more" href="{h("facilities.html")}">{x("nav_facilities")}</a>
-        <a class="learn-more" href="{h("school-life.html")}">{x("nav_life")}</a>
+    <section class="cards-block highlights-block reveal">
+      <div class="wrap">
+        <p class="section-label">{x("home_highlights_label")}</p>
+        <h2 class="section-title">{x("home_highlights_title")}</h2>
+        <div class="cards">
+          <article class="card card-plain">
+            <h3>{x("home_highlight_1_title")}</h3>
+            <p>{x("home_highlight_1_text")}</p>
+          </article>
+          <article class="card card-plain">
+            <h3>{x("home_highlight_2_title")}</h3>
+            <p>{x("home_highlight_2_text")}</p>
+          </article>
+          <article class="card card-plain">
+            <h3>{x("home_highlight_3_title")}</h3>
+            <p>{x("home_highlight_3_text")}</p>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -832,11 +1041,29 @@ def build_lang(lang: str) -> None:
         + story(x("about_who"), f"""        <p>{x("about_who_p1")}</p>
         <p>{x("about_who_p2")}</p>
 """)
-        + story(x("about_aim"), f"""        <p>{x("about_aim_p1")}</p>
-        <p>{x("about_aim_p2")}</p>
+        + story(x("about_desk"), f"""        <blockquote class="welcome-quote">
+          <p>“{x("about_desk_quote")}”</p>
+        </blockquote>
 """)
-        + story(x("about_web"), f"""        <p>{x("about_web_p1").format(results=results_link(site))}</p>
-        <p>
+        + story(x("about_aim"), f"""        <ul class="plain-list">
+          <li><strong>{x("about_vision_label")}:</strong> {x("about_vision")}</li>
+          <li><strong>{x("about_mission_label")}:</strong>
+            <ul>
+              <li>{x("about_mission_1")}</li>
+              <li>{x("about_mission_2")}</li>
+              <li>{x("about_mission_3")}</li>
+            </ul>
+          </li>
+        </ul>
+""")
+        + story(x("about_values"), f"""        <ul class="class-list">
+          <li><strong>{x("about_value_1_title")}</strong><span>{x("about_value_1_text")}</span></li>
+          <li><strong>{x("about_value_2_title")}</strong><span>{x("about_value_2_text")}</span></li>
+          <li><strong>{x("about_value_3_title")}</strong><span>{x("about_value_3_text")}</span></li>
+          <li><strong>{x("about_value_4_title")}</strong><span>{x("about_value_4_text")}</span></li>
+        </ul>
+""")
+        + story(x("about_web"), f"""        <p>
           <a class="learn-more" href="{h("facilities.html")}">{x("nav_facilities")}</a>
           <a class="learn-more" href="{h("rules.html")}">{x("nav_rules")}</a>
           <a class="learn-more" href="{h("reach.html")}">{x("nav_reach")}</a>
@@ -847,21 +1074,25 @@ def build_lang(lang: str) -> None:
     academics_main = (
         banner(x("banner_academics"))
         + crumbs(site, ("academics.html", x("nav_academics")), ("", x("crumb_classes")))
-        + story(x("acad_path"), f"""        <p>{x("acad_path_p1")}</p>
-        <p>{x("acad_path_p2").format(results=results_link(site))}</p>
+        + story(x("acad_early"), f"""        <p>{x("acad_early_p")}</p>
         <ul class="class-list">
-          <li><strong>{x("class_seedling")}</strong><span>{x("subj_early")}</span></li>
-          <li><strong>{x("class_sapling")}</strong><span>{x("subj_early")}</span></li>
-          <li><strong>{x("class_adv")}</strong><span>{x("subj_adv")}</span></li>
-          <li><strong>{x("class_1_5")}</strong><span>{x("subj_15")}</span></li>
-          <li><strong>{x("class_6_8")}</strong><span>{x("subj_68")}</span></li>
+          <li><strong>{x("acad_play_title")}</strong><span>{x("acad_play_text")}</span></li>
+          <li><strong>{x("acad_seedling_title")}</strong><span>{x("acad_seedling_text")}</span></li>
+          <li><strong>{x("acad_sapling_title")}</strong><span>{x("acad_sapling_text")}</span></li>
+          <li><strong>{x("acad_adv_title")}</strong><span>{x("acad_adv_text")}</span></li>
         </ul>
 """)
-        + story(x("acad_exams"), f"""        <p>{x("acad_exams_p")}</p>
+        + story(x("acad_primary"), f"""        <ul class="class-list">
+          <li><strong>{x("acad_prim_1_title")}</strong><span>{x("acad_prim_1_text")}</span></li>
+          <li><strong>{x("acad_prim_2_title")}</strong><span>{x("acad_prim_2_text")}</span></li>
+          <li><strong>{x("acad_prim_3_title")}</strong><span>{x("acad_prim_3_text")}</span></li>
+        </ul>
 """)
-        + story(x("acad_cal"), f"""        <p>{x("acad_cal_p").format(notices=notices_link(site, x("nav_notices")))}</p>
-""")
-        + story(x("acad_lang"), f"""        <p>{x("acad_lang_p")}</p>
+        + story(x("acad_middle"), f"""        <ul class="class-list">
+          <li><strong>{x("acad_mid_1_title")}</strong><span>{x("acad_mid_1_text")}</span></li>
+          <li><strong>{x("acad_mid_2_title")}</strong><span>{x("acad_mid_2_text")}</span></li>
+          <li><strong>{x("acad_mid_3_title")}</strong><span>{x("acad_mid_3_text")}</span></li>
+        </ul>
         <p>
           <a class="learn-more" href="{h("school-life.html")}">{x("nav_life")}</a>
           <a class="learn-more" href="{h("admissions.html")}">{x("acad_seat")}</a>
@@ -872,17 +1103,16 @@ def build_lang(lang: str) -> None:
     life_main = (
         banner(x("banner_life"))
         + crumbs(site, ("academics.html", x("nav_academics")), ("", x("nav_life")))
-        + story(x("life_day"), f"""        <p>{x("life_day_p1")}</p>
-        <p>{x("life_day_p2")}</p>
-""")
-        + story(x("life_fest"), f"""        <p>{x("life_fest_p")}</p>
-""")
-        + story(x("life_uniform"), f"""        <p>{x("life_uniform_p")}</p>
-""")
-        + story(x("life_photo"), f"""        <p>{x("life_photo_p")}</p>
+        + story(x("life_campus"), f"""        <ul class="class-list">
+          <li><strong>{x("life_1_title")}</strong><span>{x("life_1_text")}</span></li>
+          <li><strong>{x("life_2_title")}</strong><span>{x("life_2_text")}</span></li>
+          <li><strong>{x("life_3_title")}</strong><span>{x("life_3_text")}</span></li>
+          <li><strong>{x("life_4_title")}</strong><span>{x("life_4_text")}</span></li>
+          <li><strong>{x("life_5_title")}</strong><span>{x("life_5_text")}</span></li>
+        </ul>
         <p>
           <a class="learn-more" href="{h("gallery.html")}">{x("nav_gallery")}</a>
-          <a class="learn-more" href="{h("notices.html")}">{x("nav_notices")}</a>
+          <a class="learn-more" href="{h("facilities.html")}">{x("nav_facilities")}</a>
           <a class="learn-more" href="{h("rules.html")}">{x("nav_rules")}</a>
         </p>
 """)
@@ -892,9 +1122,15 @@ def build_lang(lang: str) -> None:
         banner(x("banner_facilities"))
         + crumbs(site, ("about.html", x("nav_about")), ("", x("nav_facilities")))
         + story(x("fac_on"), f"""        <p>{x("fac_on_p1")}</p>
-        <p>{x("fac_on_p2")}</p>
 """)
-        + story(x("fac_more"), f"""        <p>{x("fac_more_p")}</p>
+        + story(x("fac_infra"), f"""        <ul class="class-list">
+          <li><strong>{x("fac_1_title")}</strong><span>{x("fac_1_text")}</span></li>
+          <li><strong>{x("fac_2_title")}</strong><span>{x("fac_2_text")}</span></li>
+          <li><strong>{x("fac_3_title")}</strong><span>{x("fac_3_text")}</span></li>
+          <li><strong>{x("fac_4_title")}</strong><span>{x("fac_4_text")}</span></li>
+          <li><strong>{x("fac_5_title")}</strong><span>{x("fac_5_text")}</span></li>
+          <li><strong>{x("fac_6_title")}</strong><span>{x("fac_6_text")}</span></li>
+        </ul>
         <p>
           <a class="learn-more" href="{h("contact.html")}">{x("ask_office")}</a>
           <a class="learn-more" href="{h("reach.html")}">{x("nav_reach")}</a>
@@ -902,26 +1138,27 @@ def build_lang(lang: str) -> None:
 """)
     )
 
+    form_link = f'<a href="#enquiry">{x("adm_form_link")}</a>'
     admissions_main = (
         banner(x("banner_admissions"))
-        + crumbs(site, ("admissions.html", x("nav_admissions")), ("", x("crumb_enquire")))
-        + story(x("adm_year"), f"""        <p>{x("adm_year_p1")}</p>
-        <p>{x("adm_year_p2")}</p>
-""")
-        + story(x("adm_how"), f"""        <p>{x("adm_how_p").format(mail=site.mail_link())}</p>
-""")
-        + story(x("adm_papers"), f"""        <p>{x("adm_papers_p")}</p>
-""")
-        + story(x("life_uniform"), f"""        <p>{x("adm_uniform_p")}</p>
-""")
-        + story(x("adm_tc"), f"""        <p>{x("adm_tc_p")}</p>
+        + crumbs(site, ("admissions.html", x("nav_admissions")), ("", x("adm_overview")))
+        + story(x("adm_overview"), f"""        <p>{x("adm_welcome")}</p>
+        <p><strong>{x("adm_elig_label")}:</strong> {x("adm_elig")}</p>
+        <p><strong>{x("adm_process")}:</strong></p>
+        <ol class="plain-list">
+          <li>{x("adm_step1").format(form_link=form_link)}</li>
+          <li>{x("adm_step2")}</li>
+          <li>{x("adm_step3")}</li>
+        </ol>
         <p><a class="learn-more" href="{h("faq.html")}">{x("adm_faq")}</a></p>
 """)
-        + story(x("adm_write"), f"""        <p>{x("adm_write_p")}</p>
-        <p>
-          <a href="{mail_href(x("mail_subject_adm"))}" rel="noopener noreferrer" target="_blank">npsd1970@gmail.com</a>
-        </p>
-""")
+        + story(
+            x("adm_enquire"),
+            f"""        <p>{x("adm_enquire_p")}</p>
+{inquiry_form_html(site)}
+""",
+            section_id="enquiry",
+        )
     )
 
     faq_main = (
@@ -930,33 +1167,35 @@ def build_lang(lang: str) -> None:
         + story(
             x("faq_q"),
             f"""        <div class="faq">
-          <details open>
+          <details name="faq">
             <summary>{x("faq_q1")}</summary>
-            <p>{x("faq_a1")}</p>
+            <div class="faq-answer">
+            {x("faq_a1")}
+            </div>
           </details>
-          <details>
+          <details name="faq">
             <summary>{x("faq_q2")}</summary>
-            <p>{x("faq_a2")}</p>
+            <div class="faq-answer">
+            {x("faq_a2")}
+            </div>
           </details>
-          <details>
+          <details name="faq">
             <summary>{x("faq_q3")}</summary>
-            <p>{x("faq_a3")}</p>
+            <div class="faq-answer">
+            {x("faq_a3")}
+            </div>
           </details>
-          <details>
+          <details name="faq">
             <summary>{x("faq_q4")}</summary>
-            <p>{x("faq_a4")}</p>
+            <div class="faq-answer">
+            {x("faq_a4")}
+            </div>
           </details>
-          <details>
+          <details name="faq">
             <summary>{x("faq_q5")}</summary>
-            <p>{x("faq_a5")}</p>
-          </details>
-          <details>
-            <summary>{x("faq_q6")}</summary>
-            <p>{x("faq_a6")}</p>
-          </details>
-          <details>
-            <summary>{x("faq_q7")}</summary>
-            <p>{x("faq_a7")}</p>
+            <div class="faq-answer">
+            {x("faq_a5")}
+            </div>
           </details>
         </div>
 """,
@@ -965,15 +1204,38 @@ def build_lang(lang: str) -> None:
 
     notices_main = (
         banner(x("banner_notices"))
-        + crumbs(site, ("notices.html", x("nav_notices")), ("", x("crumb_from_office")))
+        + crumbs(site, ("notices.html", x("nav_notices")), ("", x("nav_notices_board")))
+        + story(x("notices_from"), f"""        <p>{x("notices_p")}</p>
+""")
+        + story(x("notices_latest"), f"""        <ul class="class-list">
+          <li><strong>{x("notices_latest_1_title")}</strong><span>{x("notices_latest_1_text")}</span></li>
+          <li><strong>{x("notices_latest_2_title")}</strong><span>{x("notices_latest_2_text")}</span></li>
+          <li><strong>{x("notices_latest_3_title")}</strong><span>{x("notices_latest_3_text")}</span></li>
+          <li><strong>{x("notices_latest_4_title")}</strong><span>{x("notices_latest_4_text")}</span></li>
+        </ul>
+""")
         + story(
-            x("notices_from"),
-            f"""        <p>{x("notices_p")}</p>
-        <div class="notice-grid">
-{all_cards}
-        </div>
+            x("notices_board"),
+            f"""{notice_board_html(site, items)}
+        <p><a class="learn-more" href="{h("notices-archive.html")}">{x("nav_notices_archive")}</a></p>
+""",
+            section_id="board",
+        )
+        + story(x("notices_urgent_label"), f"""        <p class="notice-urgent">{x("notices_urgent")}</p>
+""")
+    )
+
+    notices_archive_main = (
+        banner(x("banner_notices"))
+        + crumbs(site, ("notices.html", x("nav_notices")), ("", x("nav_notices_archive")))
+        + story(
+            x("notices_archive"),
+            f"""        <p>{x("notices_archive_p")}</p>
+{notice_board_html(site, items, filters=True)}
 """,
         )
+        + story(x("notices_urgent_label"), f"""        <p class="notice-urgent">{x("notices_urgent")}</p>
+""")
     )
 
     gallery_main = (
@@ -982,10 +1244,7 @@ def build_lang(lang: str) -> None:
         + story(
             x("gal_h"),
             f"""        <p>{x("gal_p")}</p>
-        <div class="gallery-grid">
-{gallery_index_tiles(site)}
-        </div>
-""",
+{gallery_index_html(site)}""",
         )
     )
 
@@ -993,7 +1252,19 @@ def build_lang(lang: str) -> None:
         banner(x("banner_reach"))
         + crumbs(site, ("about.html", x("nav_about")), ("", x("nav_reach")))
         + story(x("reach_place"), f"""        <p>{x("reach_p")}</p>
+        <dl class="contact-dl">
+          <div><dt>{x("reach_name_l")}</dt><dd>{x("reach_name")}</dd></div>
+          <div><dt>{x("reach_address_l")}</dt><dd>{x("reach_address")}</dd></div>
+          <div><dt>{x("reach_landmark_l")}</dt><dd>{x("reach_landmark")}</dd></div>
+        </dl>
 {school_map(site)}
+""")
+        + story(x("reach_visit"), f"""        <ul class="class-list">
+          <li><strong>{x("reach_hours_title")}</strong><span>{x("reach_hours_text")}</span></li>
+          <li><strong>{x("reach_public_title")}</strong><span>{x("reach_public_text")}</span></li>
+          <li><strong>{x("reach_car_title")}</strong><span>{x("reach_car_text")}</span></li>
+          <li><strong>{x("reach_tour_title")}</strong><span>{x("reach_tour_text")}</span></li>
+        </ul>
 """)
         + story(
             x("reach_follow"),
@@ -1010,12 +1281,14 @@ def build_lang(lang: str) -> None:
         banner(x("banner_rules"))
         + crumbs(site, ("about.html", x("nav_about")), ("", x("nav_rules")))
         + story(x("rules_in"), f"""        <p>{x("rules_in_p")}</p>
-""")
-        + story(x("rules_circ"), f"""        <p>{x("rules_circ_p")}</p>
-""")
-        + story(x("rules_visit"), f"""        <p>{x("rules_visit_p")}</p>
-""")
-        + story(x("rules_priv"), f"""        <p>{x("rules_priv_p")}</p>
+        <ul class="class-list">
+          <li><strong>{x("rules_1_title")}</strong><span>{x("rules_1_text")}</span></li>
+          <li><strong>{x("rules_2_title")}</strong><span>{x("rules_2_text")}</span></li>
+          <li><strong>{x("rules_3_title")}</strong><span>{x("rules_3_text")}</span></li>
+          <li><strong>{x("rules_4_title")}</strong><span>{x("rules_4_text")}</span></li>
+          <li><strong>{x("rules_5_title")}</strong><span>{x("rules_5_text")}</span></li>
+          <li><strong>{x("rules_6_title")}</strong><span>{x("rules_6_text")}</span></li>
+        </ul>
         <p>
           <a class="learn-more" href="{h("notices.html")}">{x("nav_notices")}</a>
           <a class="learn-more" href="{h("contact.html")}">{x("nav_contact")}</a>
@@ -1052,34 +1325,52 @@ def build_lang(lang: str) -> None:
     )
     contact_main = (
         banner(x("banner_contact"))
-        + crumbs(site, ("contact.html", x("nav_contact")), ("", x("crumb_write")))
-        + story(
-            x("contact_school"),
-            f"""        <dl class="contact-dl">
-          <div>
-            <dt>{x("contact_school")}</dt>
-            <dd>{x("contact_school_name")}</dd>
-          </div>
-          <div>
-            <dt>{x("contact_place_l")}</dt>
-            <dd class="brand-place">{html.escape(x("place"))}</dd>
-          </div>
-          <div>
-            <dt>{x("contact_email_l")}</dt>
-            <dd><a class="contact-link" href="{MAIL}" rel="noopener noreferrer" target="_blank">{ICO_MAIL} npsd1970@gmail.com</a></dd>
-          </div>
-          <div>
-            <dt>Facebook</dt>
-            <dd><a class="contact-link" href="{FB}" rel="noopener noreferrer" target="_blank">{ICO_FB} {html.escape(x("fb_name"))}</a></dd>
-          </div>
-          <div>
-            <dt>Instagram</dt>
-            <dd><a class="contact-link" href="{IG}" rel="noopener noreferrer" target="_blank">{ICO_IG} nps_dharhara_official</a></dd>
-          </div>
-        </dl>
-""",
-        )
-        + story(x("contact_circ"), f"""        <p>{x("contact_circ_p")}</p>
+        + crumbs(site, ("contact.html", x("nav_contact")), ("", x("contact_touch")))
+        + story(x("contact_place"), f"""        <p>{x("contact_intro")}</p>
+        <ul class="class-list">
+          <li><strong>{x("contact_inst_l")}</strong><span>{x("contact_inst")}</span></li>
+          <li><strong>{x("contact_address_l")}</strong><span>{x("contact_address")}</span></li>
+          <li><strong>{x("contact_desk_l")}</strong><span>{x("contact_desk")}</span></li>
+        </ul>
+""")
+        + story(x("contact_touch"), f"""        <ul class="class-list">
+          <li>
+            <strong>{x("contact_email_inq")}</strong>
+            <span><a class="contact-link" href="{MAIL}" rel="noopener noreferrer" target="_blank">{ICO_MAIL} npsd1970@gmail.com</a></span>
+          </li>
+          <li>
+            <strong>{x("contact_social_l")}</strong>
+            <span>{x("contact_social_p")}</span>
+            <span class="contact-social">
+              <a class="contact-link" href="{FB}" rel="noopener noreferrer" target="_blank" aria-label="{html.escape(x("footer_fb_aria"), quote=True)}">{ICO_FB} Facebook</a>
+              <a class="contact-link" href="{IG}" rel="noopener noreferrer" target="_blank" aria-label="{html.escape(x("footer_ig_aria"), quote=True)}">{ICO_IG} Instagram</a>
+            </span>
+          </li>
+        </ul>
+""")
+        + story(x("contact_hours"), f"""        <div class="hours-table-wrap">
+          <table class="hours-table">
+            <thead>
+              <tr>
+                <th>{x("contact_hours_day")}</th>
+                <th>{x("contact_hours_time")}</th>
+                <th>{x("contact_hours_svc")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{x("contact_hours_week")}</td>
+                <td>{x("contact_hours_week_t")}</td>
+                <td>{x("contact_hours_week_s")}</td>
+              </tr>
+              <tr>
+                <td>{x("contact_hours_sun")}</td>
+                <td>{x("contact_hours_closed")}</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 """)
         + story(
             x("contact_write"),
@@ -1126,14 +1417,56 @@ def build_lang(lang: str) -> None:
         )
     )
 
+    careers_mail = (
+        f'<a class="contact-link" href="{html.escape(mail_href("Application for [Position Name] – [Your Name]"), quote=True)}" '
+        f'rel="noopener noreferrer" target="_blank">{ICO_MAIL} npsd1970@gmail.com</a>'
+    )
     careers_main = (
         banner(x("banner_careers"))
         + crumbs(site, ("careers.html", x("nav_careers")), ("", x("crumb_apply")))
+        + story(x("careers_h"), f"""        <p>{x("careers_intro")}</p>
+        <p>{x("careers_intro_2")}</p>
+""")
+        + story(x("careers_why"), f"""        <ul class="class-list">
+          <li><strong>{x("careers_why_1_title")}</strong><span>{x("careers_why_1_text")}</span></li>
+          <li><strong>{x("careers_why_2_title")}</strong><span>{x("careers_why_2_text")}</span></li>
+          <li><strong>{x("careers_why_3_title")}</strong><span>{x("careers_why_3_text")}</span></li>
+          <li><strong>{x("careers_why_4_title")}</strong><span>{x("careers_why_4_text")}</span></li>
+        </ul>
+""")
+        + story(x("careers_open"), f"""        <div class="hours-table-wrap">
+          <table class="hours-table">
+            <thead>
+              <tr>
+                <th>{x("careers_col_role")}</th>
+                <th>{x("careers_col_level")}</th>
+                <th>{x("careers_col_req")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>{x("careers_job_1_role")}</td><td>{x("careers_job_1_level")}</td><td>{x("careers_job_1_req")}</td></tr>
+              <tr><td>{x("careers_job_2_role")}</td><td>{x("careers_job_2_level")}</td><td>{x("careers_job_2_req")}</td></tr>
+              <tr><td>{x("careers_job_3_role")}</td><td>{x("careers_job_3_level")}</td><td>{x("careers_job_3_req")}</td></tr>
+              <tr><td>{x("careers_job_4_role")}</td><td>{x("careers_job_4_level")}</td><td>{x("careers_job_4_req")}</td></tr>
+              <tr><td>{x("careers_job_5_role")}</td><td>{x("careers_job_5_level")}</td><td>{x("careers_job_5_req")}</td></tr>
+            </tbody>
+          </table>
+        </div>
+""")
+        + story(x("careers_process"), f"""        <ol class="plain-list">
+          <li><strong>{x("careers_step1_title")}:</strong> {x("careers_step1")}</li>
+          <li><strong>{x("careers_step2_title")}:</strong> {x("careers_step2")}</li>
+          <li><strong>{x("careers_step3_title")}:</strong> {x("careers_step3")}</li>
+        </ol>
+""")
         + story(
             x("careers_apply"),
-            f"""        <p>{x("careers_intro")}</p>
+            f"""        <p>{x("careers_email_p").format(mail=careers_mail)}</p>
+        <p>{x("careers_form_p")}</p>
 {hiring_form_html(site)}
+        <p>{x("careers_pool")}</p>
 """,
+            section_id="apply",
         )
     )
 
@@ -1153,7 +1486,21 @@ def build_lang(lang: str) -> None:
     )
     results_main = (
         banner(x("banner_results"))
-        + crumbs(site, ("results.html", x("nav_results")), ("", x("crumb_marksheet")))
+        + crumbs(site, ("results.html", x("nav_results")), ("", x("nav_results_assess")))
+        + story(x("results_eval"), f"""        <p>{x("results_intro")}</p>
+        <ul class="class-list">
+          <li><strong>{x("results_eval_1_title")}</strong><span>{x("results_eval_1_text")}</span></li>
+          <li><strong>{x("results_eval_2_title")}</strong><span>{x("results_eval_2_text")}</span></li>
+          <li><strong>{x("results_eval_3_title")}</strong><span>{x("results_eval_3_text")}</span></li>
+        </ul>
+""", section_id="evaluation")
+        + story(x("results_ach"), f"""        <ul class="class-list">
+          <li><strong>{x("results_ach_1_title")}</strong><span>{x("results_ach_1_text")}</span></li>
+          <li><strong>{x("results_ach_2_title")}</strong><span>{x("results_ach_2_text")}</span></li>
+          <li><strong>{x("results_ach_3_title")}</strong><span>{x("results_ach_3_text")}</span></li>
+        </ul>
+        <p><a class="learn-more" href="#lookup">{x("crumb_marksheet")}</a></p>
+""", section_id="achievements")
         + story(
             x("results_see"),
             f"""        <p>{x("results_p1")}</p>
@@ -1163,6 +1510,7 @@ def build_lang(lang: str) -> None:
         </p>
         <p>{x("results_p3").format(mail=site.mail_link())}</p>
 """,
+            section_id="lookup",
         )
         + story(
             x("toppers"),
@@ -1184,6 +1532,7 @@ def build_lang(lang: str) -> None:
     write_page(site, "results.html", x("title_results"), "results", results_main, og_meta(site, x("og_results"), x("results_desc")))
     write_page(site, "faq.html", x("title_faq"), "faq", faq_main, og_meta(site, x("og_faq"), desc))
     write_page(site, "notices.html", x("title_notices"), "notices", notices_main, og_meta(site, x("og_notices"), desc))
+    write_page(site, "notices-archive.html", x("title_notices_archive"), "notices-archive", notices_archive_main, og_meta(site, x("og_notices"), desc))
     write_page(site, "gallery.html", x("title_gallery"), "gallery", gallery_main, og_meta(site, x("og_gallery"), desc))
     write_page(site, "careers.html", x("title_careers"), "careers", careers_main, og_meta(site, x("og_careers"), desc))
     write_page(site, "reach.html", x("title_reach"), "reach", reach_main, og_meta(site, x("og_reach"), desc))
@@ -1220,7 +1569,7 @@ def write_publish_files() -> None:
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Page not found · Nootan Public School, Dharhara</title>
   <meta http-equiv="refresh" content="4; url=/" />
-  <link rel="stylesheet" href="/css/styles.css?v=20260818j" />
+  <link rel="stylesheet" href="/css/styles.css?v=20260818ab" />
 </head>
 <body>
   <main id="main" class="wrap" style="padding: 4rem 1rem 6rem">
