@@ -279,7 +279,6 @@ html[lang="hi"] .hero-welcome h1,
 html[lang="hi"] .welcome-quote p,
 html[lang="hi"] .card h3,
 html[lang="hi"] .hero-quote-text p,
-html[lang="hi"] .hero-quote cite,
 html[lang="hi"] .topper-name,
 html[lang="hi"] .faq summary {
   font-family: "Noto Serif Devanagari", "Playfair Display", Georgia, serif;
@@ -290,6 +289,11 @@ html[lang="hi"] .lang-switch {
 }
 html[lang="hi"] .site-nav a {
   letter-spacing: 0.02em;
+  text-transform: none;
+}
+html[lang="hi"] .hero-quote cite {
+  font-family: "Noto Sans Devanagari", "Source Sans 3", "Segoe UI", sans-serif;
+  letter-spacing: 0.04em;
   text-transform: none;
 }
 html[lang="hi"] .gallery-slot,
@@ -622,10 +626,11 @@ body.nav-open .nav-toggle span::after,
   flex-shrink: 0;
   width: 100%;
   margin-top: 16px;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
   font-style: normal;
-  font-size: clamp(0.95rem, 1.8vw, 1.25rem);
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--gold-soft);
   text-align: right;

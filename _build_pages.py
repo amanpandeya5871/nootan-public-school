@@ -353,7 +353,7 @@ def head(site: Site, title: str, meta: str) -> str:
 {preloads}  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="{FONTS}" rel="stylesheet" />
-  <link rel="stylesheet" href="{html.escape(site.asset("css/styles.css"), quote=True)}?v=20260818ab" />
+  <link rel="stylesheet" href="{html.escape(site.asset("css/styles.css"), quote=True)}?v=20260818ah" />
 </head>
 <body>
   <a class="skip" href="#main">{html.escape(site.tx("skip"))}</a>
@@ -1565,7 +1565,7 @@ def write_publish_files() -> None:
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Page not found · Nootan Public School, Dharhara</title>
   <meta http-equiv="refresh" content="4; url=/" />
-  <link rel="stylesheet" href="/css/styles.css?v=20260818ab" />
+  <link rel="stylesheet" href="/css/styles.css?v=20260818ah" />
 </head>
 <body>
   <main id="main" class="wrap" style="padding: 4rem 1rem 6rem">
