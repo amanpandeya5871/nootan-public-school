@@ -39,6 +39,7 @@
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     document.body.classList.toggle("nav-open", open);
     if (!open) closeSubs();
+    setHeaderHeight();
   }
 
   if (toggle && nav) {
@@ -86,9 +87,26 @@
     var width = Math.round(lastLetterRight(name) - list.getBoundingClientRect().left + extra);
     if (width > 80) list.style.width = width + "px";
   }
+  function setHeaderHeight() {
+    var identity = document.querySelector(".identity");
+    var bar = document.querySelector(".site-nav-bar");
+    if (!identity) return;
+    var barH = 44;
+    if (bar && !(nav && nav.classList.contains("is-open"))) {
+      barH = Math.round(bar.getBoundingClientRect().height) || 44;
+    }
+    document.documentElement.style.setProperty(
+      "--header-h",
+      Math.round(identity.getBoundingClientRect().height + barH) + "px"
+    );
+  }
+
   function scheduleNavAlign() {
     requestAnimationFrame(function () {
-      requestAnimationFrame(alignNavWithSchoolName);
+      requestAnimationFrame(function () {
+        alignNavWithSchoolName();
+        setHeaderHeight();
+      });
     });
   }
   scheduleNavAlign();

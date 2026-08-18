@@ -21,7 +21,7 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -1628,6 +1628,17 @@ a.gallery-slot:focus-visible {
 
 @media (max-width: 960px) {
   :root { --page-x: clamp(16px, 4.5vw, 28px); }
+
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+  body {
+    padding-top: var(--header-h, 7.5rem);
+  }
 
   .identity {
     padding: 8px 48px;
