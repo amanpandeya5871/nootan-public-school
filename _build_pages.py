@@ -353,7 +353,7 @@ def head(site: Site, title: str, meta: str) -> str:
 {preloads}  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="{FONTS}" rel="stylesheet" />
-  <link rel="stylesheet" href="{html.escape(site.asset("css/styles.css"), quote=True)}?v=20260818ak" />
+  <link rel="stylesheet" href="{html.escape(site.asset("css/styles.css"), quote=True)}?v=20260818al" />
 </head>
 <body>
   <a class="skip" href="#main">{html.escape(site.tx("skip"))}</a>
@@ -526,7 +526,7 @@ def foot(site: Site) -> str:
     </div>
     <p class="legal">{x("legal")}</p>
   </footer>
-  <script src="{a("js/nav.js")}?v=20260818t"></script>
+  <script src="{a("js/nav.js")}?v=20260818u"></script>
 </body>
 </html>
 """
@@ -967,7 +967,7 @@ def build_lang(lang: str) -> None:
       </div>
     </section>
 
-    <section class="cards-block reveal">
+    <section class="cards-block">
       <div class="wrap">
         <p class="section-label">{x("home_pillars_label")}</p>
         <h2 class="section-title">{x("home_pillars_title")}</h2>
@@ -993,7 +993,7 @@ def build_lang(lang: str) -> None:
       </div>
     </section>
 
-    <section class="cards-block highlights-block reveal">
+    <section class="cards-block highlights-block">
       <div class="wrap">
         <p class="section-label">{x("home_highlights_label")}</p>
         <h2 class="section-title">{x("home_highlights_title")}</h2>
@@ -1014,7 +1014,7 @@ def build_lang(lang: str) -> None:
       </div>
     </section>
 
-    <section class="notices reveal">
+    <section class="notices">
       <div class="wrap">
         <p class="section-label">{x("home_notices_label")}</p>
         <h2 class="section-title">{x("home_notices_title")}</h2>
@@ -1025,7 +1025,7 @@ def build_lang(lang: str) -> None:
       </div>
     </section>
 
-    <section class="enquire reveal">
+    <section class="enquire">
       <h2>{x("home_help")}</h2>
       <p>{x("home_help_p")}</p>
       <a class="admit-cta" href="{h("admissions.html")}">{x("home_help_cta")}</a>
@@ -1565,7 +1565,7 @@ def write_publish_files() -> None:
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Page not found · Nootan Public School, Dharhara</title>
   <meta http-equiv="refresh" content="4; url=/" />
-  <link rel="stylesheet" href="/css/styles.css?v=20260818ak" />
+  <link rel="stylesheet" href="/css/styles.css?v=20260818al" />
 </head>
 <body>
   <main id="main" class="wrap" style="padding: 4rem 1rem 6rem">

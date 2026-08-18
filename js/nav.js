@@ -389,19 +389,28 @@
     startCarousel(root, ".gallery-slide", 4000);
   });
 
-  const extra = document.querySelectorAll(
-    "main .story h2, main .story p, main .story a.learn-more, main .page h2, main .page p, main .page li, main .page details, main .page form, main .page dl, main .gallery-slot, main .enquire h2, main .enquire p, main .section-title, main .section-label"
-  );
-  extra.forEach(function (el) {
-    el.classList.add("reveal");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function wrapPaper(el) {
+    if (el.querySelector(":scope > .reveal-paper-inner")) return;
+    const inner = document.createElement(el.tagName === "P" || el.tagName === "A" ? "span" : "div");
+    inner.className = "reveal-paper-inner";
+    while (el.firstChild) inner.appendChild(el.firstChild);
+    el.appendChild(inner);
+  }
+
+  document.querySelectorAll("main .story h2, main .page h2, main .section-title, main .enquire h2").forEach(function (el) {
+    el.classList.add("reveal-gold");
+  });
+  document.querySelectorAll("main .story p, main .story a.learn-more, main .enquire p, main .section-caption, main .sample-note").forEach(function (el) {
+    el.classList.add("reveal-paper");
+    wrapPaper(el);
+  });
+  document.querySelectorAll("main .cards, main .notice-grid, main .class-list, main .gallery-grid, main .gallery-album").forEach(function (el) {
+    el.classList.add("reveal-cascade");
   });
 
-  const nodes = document.querySelectorAll(".reveal");
-
-  function inView(el) {
-    const rect = el.getBoundingClientRect();
-    return rect.bottom > 0 && rect.top < (window.innerHeight || 0);
-  }
+  const nodes = document.querySelectorAll(".reveal-gold, .reveal-paper, .reveal-cascade");
 
   function enableReveal() {
     document.documentElement.classList.add("js");
@@ -412,7 +421,7 @@
     return;
   }
 
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  if (reduce) {
     nodes.forEach(function (el) {
       el.classList.add("is-visible");
     });
@@ -425,26 +434,17 @@
   const io = new IntersectionObserver(
     function (entries) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          io.unobserve(entry.target);
-        }
+        entry.target.classList.toggle("is-visible", entry.isIntersecting);
       });
     },
-    { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+    { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
   );
 
-  function startReveals() {
-    nodes.forEach(function (el) {
-      if (inView(el)) {
-        el.classList.add("is-visible");
-        return;
-      }
-      io.observe(el);
-    });
-  }
-
   window.requestAnimationFrame(function () {
-    window.requestAnimationFrame(startReveals);
+    window.requestAnimationFrame(function () {
+      nodes.forEach(function (el) {
+        io.observe(el);
+      });
+    });
   });
 })();
