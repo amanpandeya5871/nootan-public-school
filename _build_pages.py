@@ -1129,6 +1129,7 @@ def build_lang(lang: str) -> None:
               <h3>{x(item["class_key"])}</h3>
               <p class="topper-quote-label">{x("topper_said")}</p>
               <p class="topper-quote">“{html.escape(item["quote"][site.lang])}”</p>
+              <p class="topper-name">— {html.escape(item["name"][site.lang])}</p>
             </div>
           </article>"""
         for i, item in enumerate(TOPPERS)

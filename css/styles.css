@@ -275,6 +275,7 @@ html[lang="hi"] .page-banner h1,
 html[lang="hi"] .section-title,
 html[lang="hi"] .hero-quote-text p,
 html[lang="hi"] .hero-quote cite,
+html[lang="hi"] .topper-name,
 html[lang="hi"] .faq summary {
   font-family: "Noto Serif Devanagari", "Playfair Display", Georgia, serif;
 }
@@ -1434,8 +1435,8 @@ a.gallery-slot:focus-visible {
 .toppers-carousel {
   position: relative;
   width: 100%;
-  height: 252px;
-  min-height: 252px;
+  height: 280px;
+  min-height: 280px;
   overflow: hidden;
   background: var(--cream);
   border: 1px solid var(--line);
@@ -1458,7 +1459,7 @@ a.gallery-slot:focus-visible {
   padding: 0;
   border: 0;
   box-shadow: none;
-  height: 252px;
+  height: 280px;
 }
 
 .topper-card:nth-child(even) {
@@ -1528,6 +1529,17 @@ a.gallery-slot:focus-visible {
   color: var(--ink);
   font-size: 0.95rem;
   line-height: 1.45;
+}
+
+.topper-name {
+  margin: 12px 0 0;
+  text-align: right;
+  font-family: "Playfair Display", "Noto Serif Devanagari", Georgia, serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--teal-ink);
+  line-height: 1.3;
 }
 
 .faq details {

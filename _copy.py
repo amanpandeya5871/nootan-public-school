@@ -101,6 +101,7 @@ TOPPERS = (
     {
         "class_key": "class_seedling",
         "image": "assets/toppers/seedling.png",
+        "name": {"en": "Aarav", "hi": "आरव"},
         "quote": {
             "en": "I like sitting in a circle and saying A, B, C. Didi claps when I finish my picture.",
             "hi": "मुझे घेरे में बैठकर अ, आ बोलना अच्छा लगता है। दीदी तस्वीर पूरी होने पर ताली बजाती हैं।",
@@ -109,6 +110,7 @@ TOPPERS = (
     {
         "class_key": "class_sapling",
         "image": "assets/toppers/sapling.png",
+        "name": {"en": "Vivaan", "hi": "विवान"},
         "quote": {
             "en": "I can write my name now. Maths is counting beads, and playtime is the best.",
             "hi": "अब मैं अपना नाम लिख लेता हूँ। गणित में मनके गिनते हैं, और खेल का समय सबसे अच्छा है।",
@@ -117,6 +119,7 @@ TOPPERS = (
     {
         "class_key": "class_adv",
         "image": "assets/toppers/adv.png",
+        "name": {"en": "Advik", "hi": "अद्विक"},
         "quote": {
             "en": "Computer class is new. I like pressing the keys and watching the letters come on the screen.",
             "hi": "कंप्यूटर की कक्षा नई है। मुझे बटन दबाना और स्क्रीन पर अक्षर आना अच्छा लगता है।",
@@ -125,6 +128,7 @@ TOPPERS = (
     {
         "class_key": "class_1",
         "image": "assets/toppers/class-1.png",
+        "name": {"en": "Ananya", "hi": "अनन्या"},
         "quote": {
             "en": "I read small sentences in English and Hindi. I want my handwriting to stay neat.",
             "hi": "मैं अंग्रेज़ी और हिंदी में छोटी पंक्तियाँ पढ़ती हूँ। मेरी लिखावट साफ़ रहे, यही चाहती हूँ।",
@@ -133,6 +137,7 @@ TOPPERS = (
     {
         "class_key": "class_2",
         "image": "assets/toppers/class-2.png",
+        "name": {"en": "Kabir", "hi": "कबीर"},
         "quote": {
             "en": "Tables are hard at first, then they stay in my head. I like EVS because we talk about plants.",
             "hi": "पहाड़े पहले कठिन लगते हैं, फिर याद रह जाते हैं। ईवीएस अच्छी लगती है क्योंकि हम पौधों की बात करते हैं।",
@@ -141,6 +146,7 @@ TOPPERS = (
     {
         "class_key": "class_3",
         "image": "assets/toppers/class-3.png",
+        "name": {"en": "Ishaan", "hi": "ईशान"},
         "quote": {
             "en": "Story period is my favourite. If I read a little every day, the long words get easier.",
             "hi": "कहानी की घड़ी सबसे प्यारी है। रोज़ थोड़ा पढ़ने से बड़े शब्द आसान हो जाते हैं।",
@@ -149,6 +155,7 @@ TOPPERS = (
     {
         "class_key": "class_4",
         "image": "assets/toppers/class-4.png",
+        "name": {"en": "Anjali", "hi": "अंजलि"},
         "quote": {
             "en": "I try to finish my work in class so I can play. Hindi and Maths both need practice at home.",
             "hi": "मैं कक्षा में काम पूरा करने की कोशिश करती हूँ, फिर खेलने मिलता है। हिंदी और गणित दोनों घर पर अभ्यास चाहते हैं।",
@@ -157,6 +164,7 @@ TOPPERS = (
     {
         "class_key": "class_5",
         "image": "assets/toppers/class-5.png",
+        "name": {"en": "Rohan", "hi": "रोहन"},
         "quote": {
             "en": "I like computer and art. When I revise in the evening, the test feels fair, not sudden.",
             "hi": "मुझे कंप्यूटर और कला अच्छे लगते हैं। शाम को दोहराव कर लूँ तो परीक्षा अचानक नहीं लगती।",
@@ -165,6 +173,7 @@ TOPPERS = (
     {
         "class_key": "class_6",
         "image": "assets/toppers/class-6.png",
+        "name": {"en": "Harsh", "hi": "हर्ष"},
         "quote": {
             "en": "Science experiments stay with me. Sanskrit is new, but the shlokas are fun to say aloud.",
             "hi": "विज्ञान के प्रयोग याद रह जाते हैं। संस्कृत नई है, पर श्लोक ज़ोर से बोलना मज़ेदार है।",
@@ -173,6 +182,7 @@ TOPPERS = (
     {
         "class_key": "class_7",
         "image": "assets/toppers/class-7.png",
+        "name": {"en": "Aditya", "hi": "आदित्य"},
         "quote": {
             "en": "I keep a small timetable at home. Maps in social studies and Maths problems both need quiet time.",
             "hi": "घर पर छोटी समय-सारिणी बनाता हूँ। सामाजिक अध्ययन के नक्शे और गणित के सवाल दोनों को शांत समय चाहिए।",
@@ -181,6 +191,7 @@ TOPPERS = (
     {
         "class_key": "class_8",
         "image": "assets/toppers/class-8.png",
+        "name": {"en": "Priya", "hi": "प्रिया"},
         "quote": {
             "en": "This year I want to be ready for the next school. Teachers say practice every day, not only before the exam.",
             "hi": "इस साल अगले विद्यालय के लिए तैयार रहना चाहती हूँ। शिक्षक कहते हैं रोज़ अभ्यास करो, केवल परीक्षा से पहले नहीं।",
