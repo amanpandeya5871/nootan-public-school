@@ -407,8 +407,6 @@ html[lang="hi"] .story h2 {
   border-bottom-color: var(--gold);
 }
 
-.site-nav .has-sub:hover,
-.site-nav .has-sub:focus-within,
 .site-nav .has-sub.is-open {
   color: var(--gold-soft);
 }
@@ -426,9 +424,22 @@ html[lang="hi"] .story h2 {
   z-index: 30;
 }
 
-.site-nav .has-sub:hover > .sub,
-.site-nav .has-sub:focus-within > .sub,
 .site-nav .has-sub.is-open > .sub { display: block; }
+
+@media (hover: hover) and (pointer: fine) {
+  .site-nav .has-sub:has(> .sub-toggle:hover),
+  .site-nav .has-sub:has(> .sub:hover) {
+    color: var(--gold-soft);
+  }
+  .site-nav .has-sub:has(> .sub-toggle:hover) > .sub,
+  .site-nav .has-sub:has(> .sub:hover) > .sub {
+    display: block;
+  }
+  .site-nav .has-sub:has(> .sub-toggle:hover) > .sub-toggle::after,
+  .site-nav .has-sub:has(> .sub:hover) > .sub-toggle::after {
+    transform: rotate(180deg);
+  }
+}
 
 .site-nav .sub a {
   display: flex;
@@ -446,6 +457,8 @@ html[lang="hi"] .story h2 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  z-index: 32;
   width: 20px;
   height: 40px;
   margin: 0 8px 0 2px;
@@ -455,6 +468,14 @@ html[lang="hi"] .story h2 {
   color: inherit;
   cursor: pointer;
   flex-shrink: 0;
+}
+.sub-toggle::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: 100%;
+  height: 16px;
 }
 .sub-toggle::after {
   content: "";
@@ -467,9 +488,7 @@ html[lang="hi"] .story h2 {
   transform: none;
   transition: transform 0.2s ease;
 }
-.has-sub.is-open > .sub-toggle::after,
-.has-sub:hover > .sub-toggle::after,
-.has-sub:focus-within > .sub-toggle::after {
+.has-sub.is-open > .sub-toggle::after {
   transform: rotate(180deg);
 }
 
@@ -1731,13 +1750,14 @@ a.gallery-slot:focus-visible {
     height: 44px;
     margin: 0;
   }
+  .sub-toggle::before {
+    display: none;
+  }
   .site-nav .has-sub > .sub {
     flex: 1 0 100%;
     width: 100%;
   }
-  .site-nav .sub,
-  .site-nav .has-sub:hover > .sub,
-  .site-nav .has-sub:focus-within > .sub {
+  .site-nav .sub {
     position: static;
     display: none;
     border: 0;

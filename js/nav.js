@@ -61,16 +61,70 @@
         if (isCompactNav()) setMenu(false);
       });
     });
-    nav.querySelectorAll(".sub-toggle").forEach(function (btn) {
-      btn.addEventListener("click", function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        var item = btn.closest(".has-sub");
-        var open = !item.classList.contains("is-open");
-        closeSubs();
-        item.classList.toggle("is-open", open);
-        btn.setAttribute("aria-expanded", open ? "true" : "false");
-      });
+    nav.querySelectorAll(".has-sub").forEach(function (item) {
+      var btn = item.querySelector(".sub-toggle");
+      var sub = item.querySelector(".sub");
+      var hideTimer;
+      var pointerKind = "mouse";
+
+      function showSub() {
+        window.clearTimeout(hideTimer);
+        nav.querySelectorAll(".has-sub.is-open").forEach(function (other) {
+          if (other === item) return;
+          other.classList.remove("is-open");
+          var otherBtn = other.querySelector(".sub-toggle");
+          if (otherBtn) otherBtn.setAttribute("aria-expanded", "false");
+        });
+        item.classList.add("is-open");
+        if (btn) btn.setAttribute("aria-expanded", "true");
+      }
+
+      function hideSubSoon() {
+        hideTimer = window.setTimeout(function () {
+          item.classList.remove("is-open");
+          if (btn) btn.setAttribute("aria-expanded", "false");
+        }, 160);
+      }
+
+      function bindHover(el) {
+        if (!el) return;
+        el.addEventListener("pointerenter", function (event) {
+          pointerKind = event.pointerType || "mouse";
+          if (pointerKind === "mouse") showSub();
+        });
+        el.addEventListener("pointerleave", function (event) {
+          if ((event.pointerType || pointerKind) === "mouse") hideSubSoon();
+        });
+      }
+
+      bindHover(btn);
+      bindHover(sub);
+
+      if (btn) {
+        btn.addEventListener("pointerdown", function (event) {
+          pointerKind = event.pointerType || "mouse";
+        });
+        btn.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          window.clearTimeout(hideTimer);
+          if (pointerKind === "mouse") {
+            showSub();
+            return;
+          }
+          if (item.classList.contains("is-open")) {
+            item.classList.remove("is-open");
+            btn.setAttribute("aria-expanded", "false");
+          } else {
+            showSub();
+          }
+        });
+      }
+    });
+    document.addEventListener("click", function (event) {
+      var t = event.target;
+      if (t && t.closest && t.closest(".sub-toggle, .site-nav .sub")) return;
+      closeSubs();
     });
   }
 
