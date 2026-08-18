@@ -23,8 +23,8 @@ jobs:
 
       - name: Build static pages
         env:
-          # Set to "1" after GoDaddy DNS for www.nootanpublicschool.in points at GitHub Pages.
-          DEPLOY_CUSTOM_DOMAIN: "0"
+          # Custom domain DNS is in place at GoDaddy.
+          DEPLOY_CUSTOM_DOMAIN: "1"
         run: python3 _build_pages.py
 
       - name: Configure Pages
