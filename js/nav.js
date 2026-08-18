@@ -65,7 +65,13 @@
       var btn = item.querySelector(".sub-toggle");
       var sub = item.querySelector(".sub");
       var hideTimer;
-      var pointerKind = "mouse";
+
+      function canHoverNav() {
+        return (
+          !isCompactNav() &&
+          window.matchMedia("(hover: hover) and (pointer: fine)").matches
+        );
+      }
 
       function showSub() {
         window.clearTimeout(hideTimer);
@@ -86,29 +92,18 @@
         }, 160);
       }
 
-      function bindHover(el) {
-        if (!el) return;
-        el.addEventListener("pointerenter", function (event) {
-          pointerKind = event.pointerType || "mouse";
-          if (pointerKind === "mouse") showSub();
-        });
-        el.addEventListener("pointerleave", function (event) {
-          if ((event.pointerType || pointerKind) === "mouse") hideSubSoon();
-        });
-      }
-
-      bindHover(btn);
-      bindHover(sub);
-
       if (btn) {
-        btn.addEventListener("pointerdown", function (event) {
-          pointerKind = event.pointerType || "mouse";
+        btn.addEventListener("pointerenter", function (event) {
+          if (event.pointerType === "mouse" && canHoverNav()) showSub();
+        });
+        btn.addEventListener("pointerleave", function (event) {
+          if (event.pointerType === "mouse" && canHoverNav()) hideSubSoon();
         });
         btn.addEventListener("click", function (event) {
           event.preventDefault();
           event.stopPropagation();
           window.clearTimeout(hideTimer);
-          if (pointerKind === "mouse") {
+          if (canHoverNav()) {
             showSub();
             return;
           }
@@ -118,6 +113,17 @@
           } else {
             showSub();
           }
+        });
+      }
+      if (sub) {
+        sub.addEventListener("pointerenter", function (event) {
+          if (event.pointerType === "mouse" && canHoverNav()) {
+            window.clearTimeout(hideTimer);
+            showSub();
+          }
+        });
+        sub.addEventListener("pointerleave", function (event) {
+          if (event.pointerType === "mouse" && canHoverNav()) hideSubSoon();
         });
       }
     });

@@ -481,6 +481,7 @@ body.nav-open .nav-toggle span::after,
   color: inherit;
   cursor: pointer;
   flex-shrink: 0;
+  touch-action: manipulation;
 }
 .sub-toggle::before {
   content: "";
@@ -1764,17 +1765,16 @@ a.gallery-slot:focus-visible {
   .site-nav-bar > ul > li.has-sub > a { flex: 0 1 auto; }
   .sub-toggle {
     display: inline-flex;
-    width: 36px;
+    width: 44px;
     height: 44px;
     margin: 0;
+    touch-action: manipulation;
   }
   .sub-toggle::before {
     display: none;
   }
   .site-nav-bar > ul > li.has-sub > .sub,
-  .site-nav .has-sub > .sub,
-  .site-nav .has-sub:has(> .sub-toggle:hover) > .sub,
-  .site-nav .has-sub:has(> .sub:hover) > .sub {
+  .site-nav .has-sub > .sub {
     position: static;
     top: auto;
     left: auto;
