@@ -37,6 +37,16 @@
     if (!toggle || !nav) return;
     nav.classList.toggle("is-open", open);
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    toggle.setAttribute(
+      "aria-label",
+      open
+        ? document.documentElement.lang === "hi"
+          ? "मेनू बंद करें"
+          : "Close menu"
+        : document.documentElement.lang === "hi"
+          ? "मेनू खोलें"
+          : "Open menu"
+    );
     document.body.classList.toggle("nav-open", open);
     if (!open) closeSubs();
     setHeaderHeight();

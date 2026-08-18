@@ -321,6 +321,7 @@ html[lang="hi"] .story h2 {
   background: var(--ink);
   margin: 0 auto;
   position: relative;
+  transition: transform 0.2s ease, top 0.2s ease, background-color 0.2s ease;
 }
 .nav-toggle span::before,
 .nav-toggle span::after {
@@ -330,6 +331,17 @@ html[lang="hi"] .story h2 {
 }
 .nav-toggle span::before { top: -6px; }
 .nav-toggle span::after { top: 6px; }
+.nav-toggle[aria-expanded="true"] span {
+  background: transparent;
+}
+.nav-toggle[aria-expanded="true"] span::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+.nav-toggle[aria-expanded="true"] span::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
 
 .site-nav {
   position: relative;
@@ -1730,14 +1742,24 @@ a.gallery-slot:focus-visible {
     display: none;
     border: 0;
     min-width: 0;
-    background: #0a5c56;
-    padding: 0 0 8px 16px;
+    background: transparent;
+    padding: 0;
   }
   .site-nav .has-sub.is-open > .sub {
     display: block;
     position: static;
     flex: 1 0 100%;
     width: 100%;
+    padding: 0 12px 8px 2rem;
+  }
+  .site-nav .sub a {
+    padding: 0 0 0 12px;
+    min-height: 42px;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    border-bottom: 0;
+    border-left: 2px solid var(--gold);
+    color: #d1e7e2;
   }
 
   .cards-block { padding: 40px var(--page-x) 48px; }
