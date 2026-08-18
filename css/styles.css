@@ -2230,20 +2230,20 @@ a.gallery-slot:focus-visible {
     width: clamp(40px, 11vw, 64px);
     height: clamp(40px, 11vw, 64px);
   }
-  .brand-text { margin: 0; text-align: left; min-width: 0; }
+  .brand-text { margin: 0; text-align: center; min-width: 0; }
   .brand-name {
     white-space: nowrap;
     font-size: clamp(1.12rem, 4.4vw, 2rem);
     font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1.1;
-    margin: 0;
+    margin: 0 auto;
     width: fit-content;
-    text-align: left;
+    text-align: center;
   }
   .brand-place {
     font-size: clamp(0.62rem, 2.2vw, 0.9rem);
-    text-align: left;
+    text-align: center;
     white-space: nowrap;
   }
   .nav-toggle {
@@ -2529,7 +2529,7 @@ a.gallery-slot:focus-visible {
   }
   .brand-text {
     margin: 0;
-    text-align: left;
+    text-align: center;
   }
   .brand-name {
     white-space: nowrap;
@@ -2537,14 +2537,14 @@ a.gallery-slot:focus-visible {
     font-weight: 700;
     letter-spacing: -0.04em;
     width: max-content;
-    margin: 0;
-    text-align: left;
+    margin: 0 auto;
+    text-align: center;
     line-height: 1.08;
   }
   .brand-place {
     white-space: nowrap;
     font-size: min(2.6vw, 0.74rem);
-    text-align: left;
+    text-align: center;
   }
 }
 
@@ -2567,16 +2567,16 @@ a.gallery-slot:focus-visible {
     transform: none;
   }
   .brand img { width: 42px; height: 42px; flex-shrink: 0; }
-  .brand-text { margin: 0; text-align: left; }
+  .brand-text { margin: 0; text-align: center; }
   .brand-name {
     white-space: nowrap;
     font-size: clamp(1.05rem, 3.2vw, 1.55rem);
     font-weight: 700;
     letter-spacing: -0.03em;
-    margin: 0;
-    text-align: left;
+    margin: 0 auto;
+    text-align: center;
   }
-  .brand-place { font-size: 0.72rem; margin-top: 2px; text-align: left; }
+  .brand-place { font-size: 0.72rem; margin-top: 2px; text-align: center; }
   .nav-toggle {
     right: var(--header-end);
     width: 44px;
