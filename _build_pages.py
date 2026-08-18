@@ -282,6 +282,7 @@ def nav(site: Site, current: str) -> str:
         <li><a href="{h("index.html")}"{cur("home")}>{x("nav_home")}</a></li>
         <li class="has-sub">
           <a href="{h("about.html")}"{cur("about")}>{x("nav_about")}</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-label="{html.escape(x("open_sub"), quote=True)}"></button>
           <ul class="sub">
             <li><a href="{h("about.html")}">{x("nav_about_school")}</a></li>
             <li><a href="{h("facilities.html")}"{cur("facilities")}>{x("nav_facilities")}</a></li>
@@ -291,6 +292,7 @@ def nav(site: Site, current: str) -> str:
         </li>
         <li class="has-sub">
           <a href="{h("academics.html")}"{cur("academics")}>{x("nav_academics")}</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-label="{html.escape(x("open_sub"), quote=True)}"></button>
           <ul class="sub">
             <li><a href="{h("academics.html")}">{x("nav_classes")}</a></li>
             <li><a href="{h("school-life.html")}"{cur("life")}>{x("nav_life")}</a></li>
@@ -298,6 +300,7 @@ def nav(site: Site, current: str) -> str:
         </li>
         <li class="has-sub">
           <a href="{h("admissions.html")}"{cur("admissions")}>{x("nav_admissions")}</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-label="{html.escape(x("open_sub"), quote=True)}"></button>
           <ul class="sub">
             <li><a href="{h("admissions.html")}">{x("nav_enquire")}</a></li>
             <li><a href="{h("faq.html")}"{cur("faq")}>{x("nav_faq")}</a></li>

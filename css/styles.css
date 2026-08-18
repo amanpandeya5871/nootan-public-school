@@ -412,6 +412,34 @@ html[lang="hi"] .story h2 {
 
 .site-nav .sub a:hover { background: rgba(0, 0, 0, 0.12); }
 
+.sub-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--gold-soft);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.sub-toggle::after {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 0 auto;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+.has-sub.is-open > .sub-toggle::after {
+  transform: rotate(225deg);
+  margin-top: 4px;
+}
+
 /* —— Hero —— */
 .hero {
   position: relative;
@@ -1582,18 +1610,28 @@ a.gallery-slot:focus-visible {
   :root { --page-x: clamp(16px, 4.5vw, 28px); }
 
   .identity {
-    padding: 10px 56px 10px 12px;
+    padding: 10px 56px;
     gap: 10px;
+    justify-content: center;
   }
   .identity-leaf { max-width: min(88px, 14vw); opacity: 0.4; }
-  .brand { max-width: none; gap: 10px; justify-content: flex-start; }
+  .brand {
+    max-width: none;
+    gap: 10px;
+    justify-content: center;
+    text-align: center;
+  }
   .brand img { width: 72px; height: 72px; }
+  .brand-text { margin: 0 auto; text-align: center; }
   .brand-name {
     white-space: normal;
     font-size: clamp(1.45rem, 6.2vw, 2.2rem);
     line-height: 1.15;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
   }
-  .brand-place { font-size: 0.95rem; }
+  .brand-place { font-size: 0.95rem; text-align: center; }
   .nav-toggle { display: grid; place-items: center; }
 
   .site-nav-bar {
@@ -1629,14 +1667,27 @@ a.gallery-slot:focus-visible {
     justify-content: flex-start;
     min-height: 44px;
   }
-  .site-nav .sub {
+  .site-nav .has-sub {
+    display: grid;
+    grid-template-columns: 1fr 44px;
+    align-items: center;
+  }
+  .site-nav .has-sub > a { grid-column: 1; }
+  .sub-toggle { display: grid; place-items: center; grid-column: 2; grid-row: 1; }
+  .site-nav .has-sub > .sub {
+    grid-column: 1 / -1;
+  }
+  .site-nav .sub,
+  .site-nav .has-sub:hover > .sub,
+  .site-nav .has-sub:focus-within > .sub {
     position: static;
-    display: block;
+    display: none;
     border: 0;
     min-width: 0;
     background: #0a5c56;
-    padding: 0 0 8px 8px;
+    padding: 0 0 8px 12px;
   }
+  .site-nav .has-sub.is-open > .sub { display: block; }
 
   .cards-block { padding: 40px var(--page-x) 48px; }
   .page { padding: 28px var(--page-x) 48px; }
@@ -1730,7 +1781,8 @@ a.gallery-slot:focus-visible {
 
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --page-x: 16px; }
-  .identity { padding: 6px 52px 6px 10px; }
+  .identity { padding: 6px 52px; }
+  .brand { justify-content: center; }
   .brand img { width: 48px; height: 48px; }
   .brand-name { font-size: clamp(1.15rem, 3.6vw, 1.6rem); }
   .brand-place { font-size: 0.8rem; margin-top: 2px; }
