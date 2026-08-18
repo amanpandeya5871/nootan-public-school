@@ -1624,35 +1624,42 @@ a.gallery-slot:focus-visible {
   .gallery-grid,
   .gallery-album { grid-template-columns: 1fr 1fr; }
   .class-list { grid-template-columns: 1fr 1fr; }
-  .brand-name { white-space: normal; }
 }
 
 @media (max-width: 960px) {
   :root { --page-x: clamp(16px, 4.5vw, 28px); }
 
   .identity {
-    padding: 10px 56px;
-    gap: 10px;
+    padding: 8px 48px;
+    gap: 8px;
     justify-content: center;
   }
-  .identity-leaf { max-width: min(88px, 14vw); opacity: 0.4; }
+  .identity-leaf { max-width: min(72px, 12vw); opacity: 0.35; }
   .brand {
     max-width: none;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
     text-align: center;
+    min-width: 0;
   }
-  .brand img { width: 72px; height: 72px; }
-  .brand-text { margin: 0 auto; text-align: center; }
+  .brand img {
+    width: clamp(40px, 11vw, 64px);
+    height: clamp(40px, 11vw, 64px);
+  }
+  .brand-text { margin: 0 auto; text-align: center; min-width: 0; }
   .brand-name {
-    white-space: normal;
-    font-size: clamp(1.45rem, 6.2vw, 2.2rem);
+    white-space: nowrap;
+    font-size: clamp(0.72rem, 3.6vw, 2.15rem);
     line-height: 1.15;
     margin-left: auto;
     margin-right: auto;
     text-align: center;
   }
-  .brand-place { font-size: 0.95rem; text-align: center; }
+  .brand-place {
+    font-size: clamp(0.62rem, 2.4vw, 0.95rem);
+    text-align: center;
+    white-space: nowrap;
+  }
   .nav-toggle { display: grid; place-items: center; }
 
   .site-nav-bar {
@@ -1733,10 +1740,12 @@ a.gallery-slot:focus-visible {
 }
 
 @media (max-width: 640px) {
-  .identity-leaf,
-  .page-flora { display: none; }
-  .brand img { width: 64px; height: 64px; }
-  .brand-name { font-size: clamp(1.35rem, 7.2vw, 1.85rem); }
+  .page-flora-leaf { opacity: 0.22; }
+  .brand img {
+    width: clamp(36px, 10vw, 52px);
+    height: clamp(36px, 10vw, 52px);
+  }
+  .brand-name { font-size: clamp(0.7rem, 3.55vw, 1.35rem); }
 
   .hero {
     height: auto;
@@ -1814,10 +1823,13 @@ a.gallery-slot:focus-visible {
 
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --page-x: 16px; }
-  .identity { padding: 6px 52px; }
+  .identity { padding: 6px 48px; }
   .brand { justify-content: center; }
-  .brand img { width: 48px; height: 48px; }
-  .brand-name { font-size: clamp(1.15rem, 3.6vw, 1.6rem); }
+  .brand img { width: 44px; height: 44px; }
+  .brand-name {
+    white-space: nowrap;
+    font-size: clamp(0.85rem, 3.2vw, 1.5rem);
+  }
   .brand-place { font-size: 0.8rem; margin-top: 2px; }
   .nav-toggle { width: 44px; height: 44px; }
   .hero {
