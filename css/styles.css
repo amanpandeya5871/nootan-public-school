@@ -2168,36 +2168,44 @@ a.gallery-slot:focus-visible {
   }
 
   .identity {
-    padding: 8px 56px;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 8px 56px 8px 12px;
     gap: 8px;
     justify-content: center;
   }
   .identity-leaf { max-width: min(72px, 12vw); opacity: 0.35; }
   .brand {
-    max-width: none;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
     gap: 8px;
-    justify-content: center;
-    text-align: center;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: left;
     min-width: 0;
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto;
   }
   .brand img {
     width: clamp(40px, 11vw, 64px);
     height: clamp(40px, 11vw, 64px);
   }
-  .brand-text { margin: 0 auto; text-align: center; min-width: 0; }
+  .brand-text { margin: 0; text-align: left; min-width: 0; }
   .brand-name {
     white-space: nowrap;
-    font-size: clamp(1.22rem, 5.1vw, 2.4rem);
+    font-size: clamp(1.12rem, 4.4vw, 2rem);
     font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1.1;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
+    margin: 0;
+    width: fit-content;
+    text-align: left;
   }
   .brand-place {
-    font-size: clamp(0.62rem, 2.4vw, 0.95rem);
-    text-align: center;
+    font-size: clamp(0.62rem, 2.2vw, 0.9rem);
+    text-align: left;
     white-space: nowrap;
   }
   .nav-toggle { display: grid; place-items: center; }
@@ -2306,10 +2314,10 @@ a.gallery-slot:focus-visible {
 @media (max-width: 640px) {
   .page-flora-leaf { opacity: 0.22; }
   .brand img {
-    width: clamp(36px, 10vw, 52px);
-    height: clamp(36px, 10vw, 52px);
+    width: clamp(36px, 9vw, 48px);
+    height: clamp(36px, 9vw, 48px);
   }
-  .brand-name { font-size: clamp(1.22rem, 5.2vw, 1.85rem); }
+  .brand-name { font-size: clamp(1.05rem, 4.4vw, 1.45rem); }
 
   .hero-welcome {
     padding: 0;
@@ -2452,59 +2460,77 @@ a.gallery-slot:focus-visible {
     background: rgba(255, 255, 255, 0.48);
   }
   .identity {
-    padding: 8px 56px;
+    width: 100%;
+    max-width: none;
+    padding: 8px 56px 8px 10px;
     gap: 8px;
     justify-content: center;
   }
   .brand {
     flex: 0 0 auto;
     flex-wrap: nowrap;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     width: max-content;
-    max-width: calc(100% - 4px);
+    max-width: 100%;
     margin: 0 auto;
-    transform: none;
+    transform: translateX(-10px);
   }
   .brand img {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
   }
   .brand-text {
     margin: 0;
-    text-align: center;
+    text-align: left;
   }
   .brand-name {
     white-space: nowrap;
-    font-size: clamp(1.2rem, 5.5vw, 1.7rem);
+    font-size: clamp(1.02rem, 4.3vw, 1.42rem);
     font-weight: 700;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.04em;
     width: max-content;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
+    margin: 0;
+    text-align: left;
     line-height: 1.08;
   }
   .brand-place {
     white-space: nowrap;
-    font-size: min(2.8vw, 0.78rem);
-    text-align: center;
+    font-size: min(2.6vw, 0.74rem);
+    text-align: left;
   }
 }
 
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --page-x: 16px; }
-  .identity { padding: 6px 56px; justify-content: center; }
-  .brand { flex: 1 1 auto; justify-content: center; transform: none; width: auto; }
-  .brand img { width: 44px; height: 44px; }
+  .identity {
+    width: 100%;
+    max-width: none;
+    padding: 6px 52px 6px 16px;
+    justify-content: center;
+  }
+  .brand {
+    flex: 0 0 auto;
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    transform: none;
+  }
+  .brand img { width: 42px; height: 42px; flex-shrink: 0; }
+  .brand-text { margin: 0; text-align: left; }
   .brand-name {
     white-space: nowrap;
-    font-size: clamp(1.15rem, 3.6vw, 1.85rem);
+    font-size: clamp(1.05rem, 3.2vw, 1.55rem);
     font-weight: 700;
     letter-spacing: -0.03em;
+    margin: 0;
+    text-align: left;
   }
-  .brand-place { font-size: 0.8rem; margin-top: 2px; }
+  .brand-place { font-size: 0.72rem; margin-top: 2px; text-align: left; }
   .nav-toggle { width: 44px; height: 44px; }
   .hero {
     height: auto;
