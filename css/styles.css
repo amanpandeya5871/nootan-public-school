@@ -300,8 +300,8 @@ html[lang="hi"] .story h2 {
 .nav-toggle {
   display: none;
   position: absolute;
-  z-index: 4;
-  right: 0;
+  z-index: 20;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   width: 48px;
@@ -311,35 +311,46 @@ html[lang="hi"] .story h2 {
   cursor: pointer;
   padding: 0;
 }
-
-.nav-toggle span,
-.nav-toggle span::before,
-.nav-toggle span::after {
+.nav-toggle span {
   display: block;
   width: 18px;
   height: 2px;
-  background: var(--ink);
   margin: 0 auto;
+  background: var(--ink);
   position: relative;
-  transition: transform 0.2s ease, top 0.2s ease, background-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 .nav-toggle span::before,
 .nav-toggle span::after {
   content: "";
   position: absolute;
   left: 0;
+  top: 0;
+  width: 18px;
+  height: 2px;
+  background: var(--ink);
+  transform-origin: center;
+  transition: transform 0.2s ease;
 }
-.nav-toggle span::before { top: -6px; }
-.nav-toggle span::after { top: 6px; }
+.nav-toggle span::before {
+  transform: translateY(-6px);
+}
+.nav-toggle span::after {
+  transform: translateY(6px);
+}
+body.nav-open .nav-toggle span,
+.nav-toggle.is-open span,
 .nav-toggle[aria-expanded="true"] span {
   background: transparent;
 }
+body.nav-open .nav-toggle span::before,
+.nav-toggle.is-open span::before,
 .nav-toggle[aria-expanded="true"] span::before {
-  top: 0;
   transform: rotate(45deg);
 }
+body.nav-open .nav-toggle span::after,
+.nav-toggle.is-open span::after,
 .nav-toggle[aria-expanded="true"] span::after {
-  top: 0;
   transform: rotate(-45deg);
 }
 
@@ -426,7 +437,7 @@ html[lang="hi"] .story h2 {
 
 .site-nav .has-sub.is-open > .sub { display: block; }
 
-@media (hover: hover) and (pointer: fine) {
+@media (hover: hover) and (pointer: fine) and (min-width: 961px) {
   .site-nav .has-sub:has(> .sub-toggle:hover),
   .site-nav .has-sub:has(> .sub:hover) {
     color: var(--gold-soft);
@@ -1738,12 +1749,15 @@ a.gallery-slot:focus-visible {
     justify-content: flex-start;
     min-height: 44px;
   }
-  .site-nav .has-sub {
+  .site-nav-bar > ul > li,
+  .site-nav-bar > ul > li.has-sub {
+    position: static;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    width: 100%;
   }
-  .site-nav .has-sub > a { flex: 0 1 auto; }
+  .site-nav-bar > ul > li.has-sub > a { flex: 0 1 auto; }
   .sub-toggle {
     display: inline-flex;
     width: 36px;
@@ -1753,24 +1767,35 @@ a.gallery-slot:focus-visible {
   .sub-toggle::before {
     display: none;
   }
-  .site-nav .has-sub > .sub {
+  .site-nav-bar > ul > li.has-sub > .sub,
+  .site-nav .has-sub > .sub,
+  .site-nav .has-sub:has(> .sub-toggle:hover) > .sub,
+  .site-nav .has-sub:has(> .sub:hover) > .sub {
+    position: static;
+    top: auto;
+    left: auto;
+    right: auto;
+    display: none;
     flex: 1 0 100%;
     width: 100%;
-  }
-  .site-nav .sub {
-    position: static;
-    display: none;
-    border: 0;
+    max-width: 100%;
     min-width: 0;
-    background: transparent;
+    margin: 0;
     padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
+  .site-nav-bar > ul > li.has-sub.is-open > .sub,
   .site-nav .has-sub.is-open > .sub {
     display: block;
     position: static;
     flex: 1 0 100%;
     width: 100%;
-    padding: 0 12px 8px 2rem;
+    min-width: 0;
+    padding: 0 16px 8px 2.1rem;
+    border: 0;
+    background: transparent;
   }
   .site-nav .sub a {
     padding: 0 0 0 12px;

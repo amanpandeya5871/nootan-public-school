@@ -36,6 +36,7 @@
   function setMenu(open) {
     if (!toggle || !nav) return;
     nav.classList.toggle("is-open", open);
+    toggle.classList.toggle("is-open", open);
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     toggle.setAttribute(
       "aria-label",
