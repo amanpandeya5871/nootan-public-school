@@ -207,9 +207,11 @@ def quotes_html(site: Site) -> str:
     blocks: list[str] = []
     for index, item in enumerate(QUOTES):
         active = " is-active" if index == 0 else ""
+        loading = "" if index == 0 else ' loading="lazy"'
+        priority = ' fetchpriority="high"' if index == 0 else ""
         blocks.append(
             f"""            <blockquote class="hero-quote{active}">
-              <img class="hero-portrait" src="{html.escape(site.asset(item["image"]), quote=True)}" alt="" />
+              <img class="hero-portrait" src="{html.escape(site.asset(item["image"]), quote=True)}" alt="" decoding="async"{loading}{priority} width="800" height="800" />
               <div class="hero-quote-text">
                 <p>“{html.escape(item["text"][site.lang])}”</p>
                 <cite>{html.escape(item["cite"][site.lang])}</cite>
@@ -223,8 +225,19 @@ def head(site: Site, title: str, meta: str) -> str:
     canon = html.escape(page_url(site), quote=True)
     en_url = html.escape(public_url("en", site.page_file), quote=True)
     hi_url = html.escape(public_url("hi", site.page_file), quote=True)
-    image = html.escape(f"{SITE_URL}/assets/npsd-crest.png", quote=True)
+    image = html.escape(f"{SITE_URL}/assets/og-crest.jpg", quote=True)
     locale = "hi_IN" if site.lang == "hi" else "en_IN"
+    crest = html.escape(site.asset("assets/npsd-crest.webp"), quote=True)
+    leaf = html.escape(site.asset("assets/header-leaf.webp"), quote=True)
+    favicon = html.escape(site.asset("assets/favicon.png"), quote=True)
+    apple = html.escape(site.asset("assets/apple-touch.png"), quote=True)
+    preloads = (
+        f'  <link rel="preload" as="image" href="{crest}" fetchpriority="high" />\n'
+        f'  <link rel="preload" as="image" href="{leaf}" />\n'
+    )
+    if site.page_file == "index.html":
+        first_quote = html.escape(site.asset("assets/quotes/vivekananda.webp"), quote=True)
+        preloads += f'  <link rel="preload" as="image" href="{first_quote}" fetchpriority="high" />\n'
     return f"""<!DOCTYPE html>
 <html lang="{site.tx("html_lang")}">
 <head>
@@ -240,16 +253,17 @@ def head(site: Site, title: str, meta: str) -> str:
   <meta property="og:image" content="{image}" />
   <meta property="og:site_name" content="Nootan Public School, Dharhara" />
   <meta property="og:locale" content="{locale}" />
-  <link rel="icon" href="{html.escape(site.asset("assets/npsd-crest.png"), quote=True)}" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="icon" href="{favicon}" sizes="48x48" type="image/png" />
+  <link rel="apple-touch-icon" href="{apple}" />
+{preloads}  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="{FONTS}" rel="stylesheet" />
-  <link rel="stylesheet" href="{html.escape(site.asset("css/styles.css"), quote=True)}?v=20260818c" />
+  <link rel="stylesheet" href="{html.escape(site.asset("css/styles.css"), quote=True)}?v=20260818d" />
 </head>
 <body>
   <a class="skip" href="#main">{html.escape(site.tx("skip"))}</a>
   <div class="page-flora" aria-hidden="true">
-    <img class="page-flora-leaf" src="{html.escape(site.asset("assets/header-leaf.png"), quote=True)}" alt="" />
+    <img class="page-flora-leaf" src="{leaf}" alt="" decoding="async" fetchpriority="low" width="900" height="900" />
   </div>
 """
 
@@ -263,15 +277,15 @@ def nav(site: Site, current: str) -> str:
     x = site.tx
     return f"""  <header class="site-header">
     <div class="wrap identity">
-      <img class="identity-leaf identity-leaf-left" src="{a("assets/header-leaf.png")}" alt="" />
+      <img class="identity-leaf identity-leaf-left" src="{a("assets/header-leaf.webp")}" alt="" decoding="async" width="900" height="900" />
       <a class="brand" href="{h("index.html")}">
-        <img src="{a("assets/npsd-crest.png")}" width="96" height="96" alt="" />
+        <img src="{a("assets/npsd-crest.webp")}" width="96" height="96" alt="" decoding="async" fetchpriority="high" />
         <div class="brand-text">
           <p class="brand-name">{html.escape(x("brand"))}</p>
           <p class="brand-place">{html.escape(x("place"))}</p>
         </div>
       </a>
-      <img class="identity-leaf identity-leaf-right" src="{a("assets/header-leaf.png")}" alt="" />
+      <img class="identity-leaf identity-leaf-right" src="{a("assets/header-leaf.webp")}" alt="" decoding="async" width="900" height="900" />
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="{html.escape(x("open_menu"), quote=True)}">
         <span></span>
       </button>
@@ -346,7 +360,7 @@ def foot(site: Site) -> str:
     <div class="wrap footer-grid">
       <div>
         <div class="footer-brand">
-          <img src="{a("assets/npsd-crest.png")}" width="48" height="48" alt="" />
+          <img src="{a("assets/npsd-crest.webp")}" width="48" height="48" alt="" decoding="async" loading="lazy" />
           <div>
             <strong>{html.escape(x("brand"))}</strong>
             <p class="brand-place">{html.escape(x("place"))}</p>
@@ -403,7 +417,7 @@ def foot(site: Site) -> str:
     </div>
     <p class="legal">{x("legal")}</p>
   </footer>
-  <script src="{a("js/nav.js")}?v=20260818c"></script>
+  <script src="{a("js/nav.js")}?v=20260818d"></script>
 </body>
 </html>
 """
@@ -477,7 +491,7 @@ def gallery_index_tiles(site: Site) -> str:
             src = html.escape(site.asset(f"gallery/{slug}/{photos[0].name}"), quote=True)
             tiles.append(
                 f'          <a class="gallery-slot has-photo" href="{href}">'
-                f'<img src="{src}" alt="" /><span>{label}</span></a>'
+                f'<img src="{src}" alt="" decoding="async" loading="lazy" /><span>{label}</span></a>'
             )
         else:
             tiles.append(f'          <a class="gallery-slot" href="{href}">{label}</a>')
@@ -495,7 +509,7 @@ def write_gallery_albums(site: Site) -> None:
             figures = "\n".join(
                 (
                     f'          <a class="gallery-shot" href="{html.escape(site.asset(f"gallery/{slug}/{path.name}"), quote=True)}">'
-                    f'<img src="{html.escape(site.asset(f"gallery/{slug}/{path.name}"), quote=True)}" alt="{html.escape(heading, quote=True)}" /></a>'
+                    f'<img src="{html.escape(site.asset(f"gallery/{slug}/{path.name}"), quote=True)}" alt="{html.escape(heading, quote=True)}" decoding="async" loading="lazy" /></a>'
                 )
                 for path in photos
             )
@@ -548,7 +562,7 @@ def write_notice_pages(site: Site, items: list[dict[str, str]]) -> None:
                 shutil.copy2(src, dest)
             body = (
                 f'        <p class="notice-date">{date_line} · {html.escape(site.tx("notice_circular"))}</p>\n'
-                f'        <img class="notice-image" src="{html.escape(site.asset("notices/files/" + item["file"]), quote=True)}" alt="{heading}" />\n'
+                f'        <img class="notice-image" src="{html.escape(site.asset("notices/files/" + item["file"]), quote=True)}" alt="{heading}" decoding="async" />\n'
             )
         else:
             raw = src.read_text(encoding="utf-8").strip()
@@ -744,37 +758,37 @@ def build_lang(lang: str) -> None:
         <h2 class="section-title">{x("home_start")}</h2>
         <div class="cards">
           <a class="card" href="{h("academics.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-academics.png")}" alt="" /></div>
+            <div class="card-mark"><img src="{a("assets/cartoon-academics.webp")}" alt="" width="112" height="112" decoding="async" /></div>
             <h3>{x("nav_academics")}</h3>
             <p>{x("card_academics")}</p>
           </a>
           <a class="card" href="{h("results.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-academics.png")}" alt="" /></div>
+            <div class="card-mark"><img src="{a("assets/cartoon-academics.webp")}" alt="" width="112" height="112" decoding="async" /></div>
             <h3>{x("nav_results")}</h3>
             <p>{x("card_results")}</p>
           </a>
           <a class="card" href="{h("admissions.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-admissions.png")}" alt="" /></div>
+            <div class="card-mark"><img src="{a("assets/cartoon-admissions.webp")}" alt="" width="112" height="112" decoding="async" /></div>
             <h3>{x("nav_admissions")}</h3>
             <p>{x("card_admissions")}</p>
           </a>
           <a class="card" href="{h("contact.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-contact.png")}" alt="" /></div>
+            <div class="card-mark"><img src="{a("assets/cartoon-contact.webp")}" alt="" width="112" height="112" decoding="async" /></div>
             <h3>{x("nav_contact")}</h3>
             <p>{x("card_contact")}</p>
           </a>
           <a class="card" href="{h("facilities.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-facilities.png")}" alt="" /></div>
+            <div class="card-mark"><img src="{a("assets/cartoon-facilities.webp")}" alt="" width="112" height="112" decoding="async" /></div>
             <h3>{x("nav_facilities")}</h3>
             <p>{x("card_facilities")}</p>
           </a>
           <a class="card" href="{h("school-life.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-school-life.png")}" alt="" /></div>
+            <div class="card-mark"><img src="{a("assets/cartoon-school-life.webp")}" alt="" width="112" height="112" decoding="async" /></div>
             <h3>{x("nav_life")}</h3>
             <p>{x("card_life")}</p>
           </a>
           <a class="card" href="{h("notices.html")}">
-            <div class="card-mark"><img src="{a("assets/cartoon-notices.png")}" alt="" /></div>
+            <div class="card-mark"><img src="{a("assets/cartoon-notices.webp")}" alt="" width="112" height="112" decoding="async" /></div>
             <h3>{x("nav_notices")}</h3>
             <p>{x("card_notices")}</p>
           </a>
@@ -1126,7 +1140,7 @@ def build_lang(lang: str) -> None:
     topper_cards = "\n".join(
         f"""          <article class="topper-card{' is-active' if i == 0 else ''}">
             <div class="topper-photo">
-              <img src="{html.escape(site.asset(item["image"]), quote=True)}" alt="" />
+              <img src="{html.escape(site.asset(item["image"]), quote=True)}" alt="" decoding="async"{' fetchpriority="high"' if i == 0 else ' loading="lazy"'} width="466" height="700" />
             </div>
             <div class="topper-copy">
               <h3>{x(item["class_key"])}</h3>
@@ -1206,7 +1220,7 @@ def write_publish_files() -> None:
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Page not found · Nootan Public School, Dharhara</title>
   <meta http-equiv="refresh" content="4; url=/" />
-  <link rel="stylesheet" href="/css/styles.css?v=20260818c" />
+  <link rel="stylesheet" href="/css/styles.css?v=20260818d" />
 </head>
 <body>
   <main id="main" class="wrap" style="padding: 4rem 1rem 6rem">

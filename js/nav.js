@@ -1,5 +1,4 @@
 (function () {
-  document.documentElement.classList.add("js");
 
   (function fillAcademicYear() {
     var year = new Date().getFullYear();
@@ -329,17 +328,26 @@
   });
 
   const nodes = document.querySelectorAll(".reveal");
-  if (!nodes.length) return;
 
   function inView(el) {
     const rect = el.getBoundingClientRect();
     return rect.bottom > 0 && rect.top < (window.innerHeight || 0);
   }
 
+  function enableReveal() {
+    document.documentElement.classList.add("js");
+  }
+
+  if (!nodes.length) {
+    enableReveal();
+    return;
+  }
+
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     nodes.forEach(function (el) {
       el.classList.add("is-visible");
     });
+    enableReveal();
     return;
   }
 
@@ -361,4 +369,5 @@
     }
     io.observe(el);
   });
+  enableReveal();
 })();

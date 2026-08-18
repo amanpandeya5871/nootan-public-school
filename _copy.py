@@ -16,7 +16,7 @@ def academic_year(lang: str = "en") -> str:
 
 QUOTES = (
     {
-        "image": "assets/quotes/vivekananda.png",
+        "image": "assets/quotes/vivekananda.webp",
         "cite": {"en": "Swami Vivekananda", "hi": "स्वामी विवेकानंद"},
         "text": {
             "en": "Education is the manifestation of the perfection already in man.",
@@ -24,7 +24,7 @@ QUOTES = (
         },
     },
     {
-        "image": "assets/quotes/kalam.png",
+        "image": "assets/quotes/kalam.webp",
         "cite": {"en": "A. P. J. Abdul Kalam", "hi": "ए. पी. जे. अब्दुल कलाम"},
         "text": {
             "en": "The purpose of education is to make good human beings with skill and expertise. Enlightened human beings can be created by teachers.",
@@ -32,7 +32,7 @@ QUOTES = (
         },
     },
     {
-        "image": "assets/quotes/tagore.png",
+        "image": "assets/quotes/tagore.webp",
         "cite": {"en": "Rabindranath Tagore", "hi": "रबीन्द्रनाथ ठाकुर"},
         "text": {
             "en": "The highest education is that which does not merely give us information but makes our life in harmony with all existence.",
@@ -40,7 +40,7 @@ QUOTES = (
         },
     },
     {
-        "image": "assets/quotes/gandhi.png",
+        "image": "assets/quotes/gandhi.webp",
         "cite": {"en": "Mahatma Gandhi", "hi": "महात्मा गांधी"},
         "text": {
             "en": "Literacy in itself is no education. Literacy is not the end of education or even the beginning.",
@@ -48,7 +48,7 @@ QUOTES = (
         },
     },
     {
-        "image": "assets/quotes/vivekananda.png",
+        "image": "assets/quotes/vivekananda.webp",
         "cite": {"en": "Swami Vivekananda", "hi": "स्वामी विवेकानंद"},
         "text": {
             "en": "We want that education by which character is formed, strength of mind is increased, the intellect is expanded, and by which one can stand on one’s own feet.",
@@ -56,7 +56,7 @@ QUOTES = (
         },
     },
     {
-        "image": "assets/quotes/kalam.png",
+        "image": "assets/quotes/kalam.webp",
         "cite": {"en": "A. P. J. Abdul Kalam", "hi": "ए. पी. जे. अब्दुल कलाम"},
         "text": {
             "en": "Learning gives creativity, creativity leads to thinking, thinking provides knowledge, and knowledge makes you great.",
@@ -64,7 +64,7 @@ QUOTES = (
         },
     },
     {
-        "image": "assets/quotes/radhakrishnan.png",
+        "image": "assets/quotes/radhakrishnan.webp",
         "cite": {"en": "Dr S. Radhakrishnan", "hi": "डॉ. एस. राधाकृष्णन"},
         "text": {
             "en": "The true teachers are those who help us think for ourselves.",
@@ -72,7 +72,7 @@ QUOTES = (
         },
     },
     {
-        "image": "assets/quotes/vivekananda.png",
+        "image": "assets/quotes/vivekananda.webp",
         "cite": {"en": "Swami Vivekananda", "hi": "स्वामी विवेकानंद"},
         "text": {
             "en": "Arise, awake, and stop not till the goal is reached.",
@@ -80,7 +80,7 @@ QUOTES = (
         },
     },
     {
-        "image": "assets/quotes/tagore.png",
+        "image": "assets/quotes/tagore.webp",
         "cite": {"en": "Rabindranath Tagore", "hi": "रबीन्द्रनाथ ठाकुर"},
         "text": {
             "en": "Don’t limit a child to your own learning, for he was born in another time.",
@@ -88,7 +88,7 @@ QUOTES = (
         },
     },
     {
-        "image": "assets/quotes/kalam.png",
+        "image": "assets/quotes/kalam.webp",
         "cite": {"en": "A. P. J. Abdul Kalam", "hi": "ए. पी. जे. अब्दुल कलाम"},
         "text": {
             "en": "Dream, dream, dream. Dreams transform into thoughts and thoughts result in action.",
@@ -100,7 +100,7 @@ QUOTES = (
 TOPPERS = (
     {
         "class_key": "class_seedling",
-        "image": "assets/toppers/seedling.png",
+        "image": "assets/toppers/seedling.webp",
         "name": {"en": "Aarav", "hi": "आरव"},
         "quote": {
             "en": "I like sitting in a circle and saying A, B, C. Didi claps when I finish my picture.",
@@ -109,7 +109,7 @@ TOPPERS = (
     },
     {
         "class_key": "class_sapling",
-        "image": "assets/toppers/sapling.png",
+        "image": "assets/toppers/sapling.webp",
         "name": {"en": "Vivaan", "hi": "विवान"},
         "quote": {
             "en": "I can write my name now. Maths is counting beads, and playtime is the best.",
@@ -118,7 +118,7 @@ TOPPERS = (
     },
     {
         "class_key": "class_adv",
-        "image": "assets/toppers/adv.png",
+        "image": "assets/toppers/adv.webp",
         "name": {"en": "Advik", "hi": "अद्विक"},
         "quote": {
             "en": "Computer class is new. I like pressing the keys and watching the letters come on the screen.",
@@ -127,7 +127,7 @@ TOPPERS = (
     },
     {
         "class_key": "class_1",
-        "image": "assets/toppers/class-1.png",
+        "image": "assets/toppers/class-1.webp",
         "name": {"en": "Ananya", "hi": "अनन्या"},
         "quote": {
             "en": "I read small sentences in English and Hindi. I want my handwriting to stay neat.",
@@ -136,7 +136,7 @@ TOPPERS = (
     },
     {
         "class_key": "class_2",
-        "image": "assets/toppers/class-2.png",
+        "image": "assets/toppers/class-2.webp",
         "name": {"en": "Kabir", "hi": "कबीर"},
         "quote": {
             "en": "Tables are hard at first, then they stay in my head. I like EVS because we talk about plants.",
@@ -145,7 +145,7 @@ TOPPERS = (
     },
     {
         "class_key": "class_3",
-        "image": "assets/toppers/class-3.png",
+        "image": "assets/toppers/class-3.webp",
         "name": {"en": "Ishaan", "hi": "ईशान"},
         "quote": {
             "en": "Story period is my favourite. If I read a little every day, the long words get easier.",
@@ -154,7 +154,7 @@ TOPPERS = (
     },
     {
         "class_key": "class_4",
-        "image": "assets/toppers/class-4.png",
+        "image": "assets/toppers/class-4.webp",
         "name": {"en": "Anjali", "hi": "अंजलि"},
         "quote": {
             "en": "I try to finish my work in class so I can play. Hindi and Maths both need practice at home.",
@@ -163,7 +163,7 @@ TOPPERS = (
     },
     {
         "class_key": "class_5",
-        "image": "assets/toppers/class-5.png",
+        "image": "assets/toppers/class-5.webp",
         "name": {"en": "Rohan", "hi": "रोहन"},
         "quote": {
             "en": "I like computer and art. When I revise in the evening, the test feels fair, not sudden.",
@@ -172,7 +172,7 @@ TOPPERS = (
     },
     {
         "class_key": "class_6",
-        "image": "assets/toppers/class-6.png",
+        "image": "assets/toppers/class-6.webp",
         "name": {"en": "Harsh", "hi": "हर्ष"},
         "quote": {
             "en": "Science experiments stay with me. Sanskrit is new, but the shlokas are fun to say aloud.",
@@ -181,7 +181,7 @@ TOPPERS = (
     },
     {
         "class_key": "class_7",
-        "image": "assets/toppers/class-7.png",
+        "image": "assets/toppers/class-7.webp",
         "name": {"en": "Aditya", "hi": "आदित्य"},
         "quote": {
             "en": "I keep a small timetable at home. Maps in social studies and Maths problems both need quiet time.",
@@ -190,7 +190,7 @@ TOPPERS = (
     },
     {
         "class_key": "class_8",
-        "image": "assets/toppers/class-8.png",
+        "image": "assets/toppers/class-8.webp",
         "name": {"en": "Priya", "hi": "प्रिया"},
         "quote": {
             "en": "This year I want to be ready for the next school. Teachers say practice every day, not only before the exam.",
