@@ -378,10 +378,27 @@ html[lang="hi"] .story h2 {
   padding: 0;
 }
 
+.site-nav-bar > ul > li.has-sub {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  color: #ecfdf8;
+}
+
+.site-nav-bar > ul > li.has-sub > a {
+  padding-right: 4px;
+}
+
 .site-nav a:hover,
 .site-nav a[aria-current="page"] {
   color: var(--gold-soft);
   border-bottom-color: var(--gold);
+}
+
+.site-nav .has-sub:hover,
+.site-nav .has-sub:focus-within,
+.site-nav .has-sub.is-open {
+  color: var(--gold-soft);
 }
 
 .site-nav .sub {
@@ -398,7 +415,8 @@ html[lang="hi"] .story h2 {
 }
 
 .site-nav .has-sub:hover > .sub,
-.site-nav .has-sub:focus-within > .sub { display: block; }
+.site-nav .has-sub:focus-within > .sub,
+.site-nav .has-sub.is-open > .sub { display: block; }
 
 .site-nav .sub a {
   display: flex;
@@ -413,31 +431,35 @@ html[lang="hi"] .story h2 {
 .site-nav .sub a:hover { background: rgba(0, 0, 0, 0.12); }
 
 .sub-toggle {
-  display: none;
-  width: 44px;
-  height: 44px;
-  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 40px;
+  margin: 0 10px 0 0;
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--gold-soft);
+  color: inherit;
   cursor: pointer;
   flex-shrink: 0;
 }
 .sub-toggle::after {
   content: "";
   display: block;
-  width: 8px;
-  height: 8px;
-  margin: 0 auto;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
   transform: rotate(45deg);
   transition: transform 0.2s ease;
 }
-.has-sub.is-open > .sub-toggle::after {
+.has-sub.is-open > .sub-toggle::after,
+.has-sub:hover > .sub-toggle::after,
+.has-sub:focus-within > .sub-toggle::after {
   transform: rotate(225deg);
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 /* —— Hero —— */
@@ -1662,20 +1684,26 @@ a.gallery-slot:focus-visible {
     padding: 8px 0 16px;
   }
   .site-nav-bar > ul > li > a { padding: 0 16px; }
+  .site-nav-bar > ul > li.has-sub > a { padding-right: 4px; }
   .site-nav.is-open .site-nav-bar > ul { display: flex; }
   .site-nav a {
     justify-content: flex-start;
     min-height: 44px;
   }
   .site-nav .has-sub {
-    display: grid;
-    grid-template-columns: 1fr 44px;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
   }
-  .site-nav .has-sub > a { grid-column: 1; }
-  .sub-toggle { display: grid; place-items: center; grid-column: 2; grid-row: 1; }
+  .site-nav .has-sub > a { flex: 0 1 auto; }
+  .sub-toggle {
+    display: inline-flex;
+    width: 36px;
+    height: 44px;
+    margin: 0;
+  }
   .site-nav .has-sub > .sub {
-    grid-column: 1 / -1;
+    flex: 1 1 100%;
   }
   .site-nav .sub,
   .site-nav .has-sub:hover > .sub,

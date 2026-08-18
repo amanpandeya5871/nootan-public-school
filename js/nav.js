@@ -54,7 +54,6 @@
       btn.addEventListener("click", function (event) {
         event.preventDefault();
         event.stopPropagation();
-        if (!isCompactNav()) return;
         var item = btn.closest(".has-sub");
         var open = !item.classList.contains("is-open");
         closeSubs();
