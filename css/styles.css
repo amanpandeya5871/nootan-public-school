@@ -1928,16 +1928,22 @@ a.gallery-slot:focus-visible {
     justify-content: center;
   }
   .brand {
+    flex: 0 0 auto;
     flex-wrap: nowrap;
     justify-content: center;
-    transform: translateX(-8px);
+    align-items: center;
+    width: max-content;
+    max-width: calc(100% - 4px);
+    margin: 0 auto;
+    transform: translateX(-12px);
   }
   .brand img {
     width: 48px;
     height: 48px;
+    flex-shrink: 0;
   }
   .brand-text {
-    margin: 0 auto;
+    margin: 0;
     text-align: center;
   }
   .brand-name {
@@ -1961,7 +1967,7 @@ a.gallery-slot:focus-visible {
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --page-x: 16px; }
   .identity { padding: 6px 56px; justify-content: center; }
-  .brand { justify-content: center; transform: none; }
+  .brand { flex: 1 1 auto; justify-content: center; transform: none; width: auto; }
   .brand img { width: 44px; height: 44px; }
   .brand-name {
     white-space: nowrap;
