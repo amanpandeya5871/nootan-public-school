@@ -615,6 +615,7 @@ body.nav-open .nav-toggle span::after,
 .hero-quote cite {
   display: block;
   flex-shrink: 0;
+  width: 100%;
   margin-top: 16px;
   font-style: normal;
   font-size: clamp(0.95rem, 1.8vw, 1.25rem);
@@ -622,6 +623,7 @@ body.nav-open .nav-toggle span::after,
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--gold-soft);
+  text-align: right;
 }
 
 .quote-nav {
