@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import csv
 import html
+import json
 import os
 import shutil
 from dataclasses import dataclass
@@ -37,6 +38,43 @@ ICO_MAIL = '<svg class="foot-ico" viewBox="0 0 24 24" aria-hidden="true"><path f
 ICO_FB = '<svg class="foot-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h2.6l.4-3H13v-2c0-.6.4-1 1-1Z"/></svg>'
 ICO_IG = '<svg class="foot-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 3h8a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V8a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3H8Zm9.2 1.3a1.05 1.05 0 1 1 0 2.1 1.05 1.05 0 0 1 0-2.1ZM12 8.2A3.8 3.8 0 1 1 8.2 12 3.8 3.8 0 0 1 12 8.2Zm0 2A1.8 1.8 0 1 0 13.8 12 1.8 1.8 0 0 0 12 10.2Z"/></svg>'
 FONTS = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Serif+Devanagari:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+SITEMAP_URLS: list[str] = []
+
+
+def pretty_rel(filename: str) -> str:
+    if filename in ("", "index.html"):
+        return ""
+    return f"{Path(filename).stem}/"
+
+
+def public_path(lang: str, filename: str) -> str:
+    rel = pretty_rel(filename)
+    if lang == "hi":
+        return f"/hi/{rel}" if rel else "/hi/"
+    return f"/{rel}" if rel else "/"
+
+
+def public_url(lang: str, filename: str) -> str:
+    return SITE_URL + public_path(lang, filename)
+
+
+def write_html_redirect(path: Path, dest: str) -> None:
+    dest_esc = html.escape(dest, quote=True)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "<!DOCTYPE html>\n"
+        '<html lang="en">\n'
+        "<head>\n"
+        '  <meta charset="utf-8" />\n'
+        f'  <meta http-equiv="refresh" content="0; url={dest_esc}" />\n'
+        f'  <link rel="canonical" href="{html.escape(SITE_URL + dest, quote=True)}" />\n'
+        "  <title>Redirecting</title>\n"
+        f"  <script>location.replace({json.dumps(dest)});</script>\n"
+        "</head>\n"
+        f'<body><p><a href="{dest_esc}">Continue</a></p></body>\n'
+        "</html>\n",
+        encoding="utf-8",
+    )
 
 
 @dataclass
@@ -48,20 +86,23 @@ class Site:
         return t(self.lang, key)
 
     def asset(self, path: str) -> str:
-        return ("../" if self.lang == "hi" else "") + path
+        return "/" + path.replace("\\", "/").lstrip("/")
 
     def href(self, page: str) -> str:
-        return page
+        return public_path(self.lang, page)
 
     def lang_href(self) -> str:
-        if self.lang == "hi":
-            return f"../{self.page_file}"
-        return f"hi/{self.page_file}"
+        other = "en" if self.lang == "hi" else "hi"
+        return public_path(other, self.page_file)
 
     def out_path(self, filename: str) -> Path:
-        folder = ROOT / "hi" if self.lang == "hi" else ROOT
+        rel = pretty_rel(filename).strip("/")
+        if self.lang == "hi":
+            folder = ROOT / "hi" / rel if rel else ROOT / "hi"
+        else:
+            folder = ROOT / rel if rel else ROOT
         folder.mkdir(parents=True, exist_ok=True)
-        return folder / filename
+        return folder / "index.html"
 
     def mail_link(self, label: str | None = None) -> str:
         text = label or "npsd1970@gmail.com"
@@ -78,10 +119,7 @@ def mail_href(subject: str = "", body: str = "") -> str:
 
 
 def page_url(site: Site, filename: str | None = None) -> str:
-    name = filename or site.page_file
-    if site.lang == "hi":
-        return f"{SITE_URL}/hi/{name}"
-    return f"{SITE_URL}/{name}"
+    return public_url(site.lang, filename or site.page_file)
 
 
 def og_meta(site: Site, title: str, description: str) -> str:
@@ -145,7 +183,7 @@ def notice_summary(site: Site, item: dict[str, str]) -> str:
 def notice_cards(site: Site, items: list[dict[str, str]]) -> str:
     bits: list[str] = []
     for item in items:
-        href = f"notice-{slug_from_file(item['file'])}.html"
+        href = site.href(f"notice-{slug_from_file(item['file'])}.html")
         bits.append(
             f"""          <a class="notice" href="{html.escape(href, quote=True)}">
             <time datetime="{html.escape(item['date'], quote=True)}">{html.escape(format_date(item['date']))}</time>
@@ -183,8 +221,8 @@ def quotes_html(site: Site) -> str:
 
 def head(site: Site, title: str, meta: str) -> str:
     canon = html.escape(page_url(site), quote=True)
-    en_url = html.escape(f"{SITE_URL}/{site.page_file}", quote=True)
-    hi_url = html.escape(f"{SITE_URL}/hi/{site.page_file}", quote=True)
+    en_url = html.escape(public_url("en", site.page_file), quote=True)
+    hi_url = html.escape(public_url("hi", site.page_file), quote=True)
     image = html.escape(f"{SITE_URL}/assets/npsd-crest.png", quote=True)
     locale = "hi_IN" if site.lang == "hi" else "en_IN"
     return f"""<!DOCTYPE html>
@@ -373,6 +411,11 @@ def write_page(site: Site, filename: str, title: str, current: str, main: str, m
     inner = main if main.strip().startswith("<main") else f'  <main id="main">\n{main}  </main>\n'
     html_out = head(site, title, meta) + nav(site, current) + inner + foot(site)
     site.out_path(filename).write_text(html_out, encoding="utf-8")
+    dest = public_path(site.lang, filename)
+    SITEMAP_URLS.append(SITE_URL + dest)
+    if filename != "index.html":
+        stub_dir = ROOT / "hi" if site.lang == "hi" else ROOT
+        write_html_redirect(stub_dir / filename, dest)
 
 
 def banner(heading: str) -> str:
@@ -1143,15 +1186,7 @@ def write_publish_files() -> None:
         f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n",
         encoding="utf-8",
     )
-    pages = [
-        path
-        for path in sorted(ROOT.glob("*.html")) + sorted((ROOT / "hi").glob("*.html"))
-        if path.name != "404.html"
-    ]
-    urls: list[str] = []
-    for path in pages:
-        loc = f"{SITE_URL}/hi/{path.name}" if path.parent.name == "hi" else f"{SITE_URL}/{path.name}"
-        urls.append(f"  <url><loc>{html.escape(loc)}</loc></url>")
+    urls = [f"  <url><loc>{html.escape(loc)}</loc></url>" for loc in dict.fromkeys(SITEMAP_URLS)]
     (ROOT / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -1166,13 +1201,13 @@ def write_publish_files() -> None:
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Page not found · Nootan Public School, Dharhara</title>
-  <meta http-equiv="refresh" content="4; url=index.html" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <meta http-equiv="refresh" content="4; url=/" />
+  <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
   <main id="main" class="wrap" style="padding: 4rem 1rem 6rem">
     <h1>This page is not on the school website.</h1>
-    <p><a class="learn-more" href="index.html">Return to the home page</a></p>
+    <p><a class="learn-more" href="/">Return to the home page</a></p>
   </main>
 </body>
 </html>
@@ -1182,6 +1217,7 @@ def write_publish_files() -> None:
 
 
 def build() -> None:
+    SITEMAP_URLS.clear()
     write_icons()
     build_lang("en")
     build_lang("hi")
