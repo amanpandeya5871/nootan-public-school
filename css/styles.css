@@ -306,6 +306,11 @@ html[lang="hi"] .story h2 {
   font-size: clamp(1.5rem, 2.6vw, 2.05rem);
   line-height: 1.3;
 }
+@media (max-width: 960px) {
+  html[lang="hi"] .brand-name {
+    font-size: clamp(1.5rem, 2.6vw, 2.05rem);
+  }
+}
 
 
 .nav-toggle {
@@ -2227,16 +2232,16 @@ a.gallery-slot:focus-visible {
     margin: 0 auto;
   }
   .brand img {
-    width: clamp(40px, 11vw, 64px);
-    height: clamp(40px, 11vw, 64px);
+    width: clamp(56px, 14vw, 72px);
+    height: clamp(56px, 14vw, 72px);
   }
   .brand-text { margin: 0; text-align: left; min-width: 0; }
   .brand-name {
     white-space: nowrap;
-    font-size: clamp(1.12rem, 4.4vw, 2rem);
+    font-size: clamp(1.65rem, 2.8vw, 2.2rem);
     font-weight: 700;
     letter-spacing: -0.03em;
-    line-height: 1.1;
+    line-height: 1.12;
     margin: 0;
     width: fit-content;
     text-align: left;
@@ -2360,10 +2365,13 @@ a.gallery-slot:focus-visible {
 @media (max-width: 640px) {
   .page-flora-leaf { opacity: 0.22; }
   .brand img {
-    width: clamp(36px, 9vw, 48px);
-    height: clamp(36px, 9vw, 48px);
+    width: clamp(52px, 14vw, 64px);
+    height: clamp(52px, 14vw, 64px);
   }
-  .brand-name { font-size: clamp(1.05rem, 4.4vw, 1.45rem); }
+  .brand-name {
+    font-size: clamp(1.65rem, 5.2vw, 1.85rem);
+    white-space: normal;
+  }
 
   .hero-welcome {
     padding: 0;
@@ -2523,8 +2531,8 @@ a.gallery-slot:focus-visible {
     transform: translateX(-10px);
   }
   .brand img {
-    width: 44px;
-    height: 44px;
+    width: 58px;
+    height: 58px;
     flex-shrink: 0;
   }
   .brand-text {
@@ -2532,18 +2540,19 @@ a.gallery-slot:focus-visible {
     text-align: left;
   }
   .brand-name {
-    white-space: nowrap;
-    font-size: clamp(1.02rem, 4.3vw, 1.42rem);
+    white-space: normal;
+    font-size: clamp(1.65rem, 2.8vw, 2.2rem);
     font-weight: 700;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.03em;
     width: max-content;
+    max-width: min(18rem, calc(100vw - 7.5rem));
     margin: 0;
     text-align: left;
-    line-height: 1.08;
+    line-height: 1.12;
   }
   .brand-place {
     white-space: nowrap;
-    font-size: min(2.6vw, 0.74rem);
+    font-size: min(2.8vw, 0.82rem);
     text-align: left;
   }
 }
@@ -2566,11 +2575,11 @@ a.gallery-slot:focus-visible {
     gap: 10px;
     transform: none;
   }
-  .brand img { width: 42px; height: 42px; flex-shrink: 0; }
+  .brand img { width: 52px; height: 52px; flex-shrink: 0; }
   .brand-text { margin: 0; text-align: left; }
   .brand-name {
     white-space: nowrap;
-    font-size: clamp(1.05rem, 3.2vw, 1.55rem);
+    font-size: clamp(1.5rem, 3.4vw, 1.85rem);
     font-weight: 700;
     letter-spacing: -0.03em;
     margin: 0;
