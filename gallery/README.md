@@ -11,7 +11,7 @@ Put photographs in these folders, then run `python _build_pages.py` from the rep
 - `activities/`
 - `office/`
 
-Use `.jpg` `.jpeg` `.png` `.webp` `.gif`. Skip names that start with `.`. Order is A–Z by filename (`01-gate.jpg`, then `02-yard.jpg`). Photos go only in these subfolders, not next to `index.html`.
+Use `.jpg` `.jpeg` `.png` `.webp` `.gif`. Skip names that start with `.`. Order is A–Z by filename (`01-gate.jpg`, then `02-yard.jpg`). Photos go in these album folders (next to that album’s page). Do not put photos next to the gallery hub `index.html`.
 
 Keep photos reasonably small (about 1600px wide). Do not add live student close-ups without office say-so.
 

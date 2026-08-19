@@ -1,6 +1,6 @@
 # Notices drop-in
 
-Do not edit `current/` or `archive/` — those are filled when the site is rebuilt.
+Pages live under this folder: `/notices/board/` and `/notices/archive/`. Individual circulars are `/notices/{slug-date}/`. Do not hand-edit `board/` or `archive/` snapshots — those are filled when the site is rebuilt.
 
 ## Yearly festivals and jayantis
 

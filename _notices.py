@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import json
 import re
+import shutil
 import urllib.request
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -15,7 +16,7 @@ OVERRIDE_CSV = NOTICES_DIR / "dates-override.csv"
 DATES_JSON = NOTICES_DIR / "dates.json"
 FESTIVALS_DIR = NOTICES_DIR / "festivals"
 OFFICE_DIR = NOTICES_DIR / "office"
-CURRENT_DIR = NOTICES_DIR / "current"
+CURRENT_DIR = NOTICES_DIR / "board"
 ARCHIVE_DIR = NOTICES_DIR / "archive"
 IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 
@@ -265,7 +266,7 @@ def _wipe_managed(folder: Path) -> None:
     if not keep.exists():
         keep.write_text("", encoding="utf-8")
     for path in folder.iterdir():
-        if path.name == ".gitkeep":
+        if path.name in {".gitkeep", "index.html"}:
             continue
         if path.is_file():
             path.unlink()
@@ -364,6 +365,9 @@ def build_notice_items(today: date | None = None) -> list[dict]:
     _wipe_managed(ARCHIVE_DIR)
     for item in items:
         write_snapshot(item, item["stage"])
+    legacy_current = NOTICES_DIR / "current"
+    if legacy_current.is_dir() and legacy_current.resolve() != CURRENT_DIR.resolve():
+        shutil.rmtree(legacy_current)
     save_dates_cache(resolved)
     _NOTICE_ITEMS = items
     return items

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import html
 import json
-import shutil
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -24,7 +23,7 @@ MAPS_URL = "https://maps.app.goo.gl/nQ6PKQLJfarx8TYy7?g_st=ig"
 NOTICES_DIR = ROOT / "notices"
 IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 GALLERY_DIR = ROOT / "gallery"
-TOPPERS_DIR = ROOT / "toppers"
+TOPPERS_DIR = ROOT / "results" / "toppers"
 TOPPER_CLASSES = (
     ("play", "class_play"),
     ("seedling", "class_seedling"),
@@ -55,9 +54,13 @@ SITEMAP_URLS: list[str] = []
 
 
 def pretty_rel(filename: str) -> str:
-    if filename in ("", "index.html"):
+    path = Path(str(filename).replace("\\", "/"))
+    if filename in ("", "index.html") or path.as_posix() in ("", ".", "index.html"):
         return ""
-    return f"{Path(filename).stem}/"
+    if path.name == "index.html":
+        parent = path.parent.as_posix()
+        return "" if parent in (".", "") else f"{parent}/"
+    return f"{path.with_suffix('').as_posix()}/"
 
 
 def public_path(lang: str, filename: str) -> str:
@@ -199,7 +202,7 @@ def notice_summary(site: Site, item: dict) -> str:
 def notice_cards(site: Site, items: list[dict[str, str]]) -> str:
     bits: list[str] = []
     for item in items:
-        href = site.href(f"notice-{item['id']}.html")
+        href = site.href(f"notices/{item['id']}.html")
         lines = notice_tense_lines(site, item)
         if lines:
             body = (
@@ -232,7 +235,7 @@ def notice_board_html(site: Site, items: list[dict[str, str]], *, filters: bool 
     x = site.tx
     rows: list[str] = []
     for item in items:
-        href = site.href(f"notice-{item['id']}.html")
+        href = site.href(f"notices/{item['id']}.html")
         title = notice_title(site, item)
         lines = notice_tense_lines(site, item)
         summary = lines["before"] if lines else notice_summary(site, item)
@@ -399,7 +402,8 @@ def head(site: Site, title: str, meta: str) -> str:
 
 def nav(site: Site, current: str) -> str:
     def cur(name: str) -> str:
-        return ' aria-current="page"' if name == current or (name == "notices" and current == "notices-archive") else ""
+        notices_on = current in ("notices", "notices-archive")
+        return ' aria-current="page"' if name == current or (name == "notices" and notices_on) else ""
 
     a = site.asset
     h = site.href
@@ -428,9 +432,9 @@ def nav(site: Site, current: str) -> str:
           <button type="button" class="sub-toggle" aria-expanded="false" aria-label="{html.escape(x("open_sub"), quote=True)}"></button>
           <ul class="sub">
             <li><a href="{h("about.html")}">{x("nav_about_school")}</a></li>
-            <li><a href="{h("facilities.html")}"{cur("facilities")}>{x("nav_facilities")}</a></li>
-            <li><a href="{h("reach.html")}"{cur("reach")}>{x("nav_reach")}</a></li>
-            <li><a href="{h("rules.html")}"{cur("rules")}>{x("nav_rules")}</a></li>
+            <li><a href="{h("about/facilities.html")}"{cur("facilities")}>{x("nav_facilities")}</a></li>
+            <li><a href="{h("about/reach.html")}"{cur("reach")}>{x("nav_reach")}</a></li>
+            <li><a href="{h("about/rules.html")}"{cur("rules")}>{x("nav_rules")}</a></li>
           </ul>
         </li>
         <li class="has-sub">
@@ -438,7 +442,7 @@ def nav(site: Site, current: str) -> str:
           <button type="button" class="sub-toggle" aria-expanded="false" aria-label="{html.escape(x("open_sub"), quote=True)}"></button>
           <ul class="sub">
             <li><a href="{h("academics.html")}">{x("nav_classes")}</a></li>
-            <li><a href="{h("school-life.html")}"{cur("life")}>{x("nav_life")}</a></li>
+            <li><a href="{h("academics/school-life.html")}"{cur("life")}>{x("nav_life")}</a></li>
           </ul>
         </li>
         <li class="has-sub">
@@ -446,7 +450,7 @@ def nav(site: Site, current: str) -> str:
           <button type="button" class="sub-toggle" aria-expanded="false" aria-label="{html.escape(x("open_sub"), quote=True)}"></button>
           <ul class="sub">
             <li><a href="{h("admissions.html")}#enquiry">{x("nav_enquire")}</a></li>
-            <li><a href="{h("faq.html")}"{cur("faq")}>{x("nav_faq")}</a></li>
+            <li><a href="{h("admissions/faq.html")}"{cur("faq")}>{x("nav_faq")}</a></li>
           </ul>
         </li>
         <li class="has-sub">
@@ -458,11 +462,11 @@ def nav(site: Site, current: str) -> str:
           </ul>
         </li>
         <li class="has-sub">
-          <a href="{h("notices.html")}"{cur("notices")}>{x("nav_notices")}</a>
+          <a href="{h("notices/board.html")}"{cur("notices")}>{x("nav_notices")}</a>
           <button type="button" class="sub-toggle" aria-expanded="false" aria-label="{html.escape(x("open_sub"), quote=True)}"></button>
           <ul class="sub">
-            <li><a href="{h("notices.html")}">{x("nav_notices_board")}</a></li>
-            <li><a href="{h("notices-archive.html")}"{cur("notices-archive")}>{x("nav_notices_archive")}</a></li>
+            <li><a href="{h("notices/board.html")}">{x("nav_notices_board")}</a></li>
+            <li><a href="{h("notices/archive.html")}"{cur("notices-archive")}>{x("nav_notices_archive")}</a></li>
           </ul>
         </li>
         <li><a href="{h("gallery.html")}"{cur("gallery")}>{x("nav_gallery")}</a></li>
@@ -515,10 +519,10 @@ def foot(site: Site) -> str:
         <h2>{x("footer_quick")}</h2>
         <ul>
           <li><a href="{h("about.html")}">{x("nav_about")}</a></li>
-          <li><a href="{h("facilities.html")}">{x("nav_facilities")}</a></li>
+          <li><a href="{h("about/facilities.html")}">{x("nav_facilities")}</a></li>
           <li><a href="{h("admissions.html")}">{x("nav_admissions")}</a></li>
           <li><a href="{h("results.html")}">{x("nav_results")}</a></li>
-          <li><a href="{h("notices.html")}">{x("nav_notices")}</a></li>
+          <li><a href="{h("notices/board.html")}">{x("nav_notices")}</a></li>
           <li><a href="{h("careers.html")}">{x("nav_careers")}</a></li>
           <li><a href="{h("contact.html")}">{x("nav_contact")}</a></li>
         </ul>
@@ -527,11 +531,11 @@ def foot(site: Site) -> str:
         <h2>{x("footer_school")}</h2>
         <ul>
           <li><a href="{h("academics.html")}">{x("nav_academics")}</a></li>
-          <li><a href="{h("school-life.html")}">{x("nav_life")}</a></li>
-          <li><a href="{h("rules.html")}">{x("nav_rules")}</a></li>
+          <li><a href="{h("academics/school-life.html")}">{x("nav_life")}</a></li>
+          <li><a href="{h("about/rules.html")}">{x("nav_rules")}</a></li>
           <li><a href="{h("gallery.html")}">{x("nav_gallery")}</a></li>
-          <li><a href="{h("faq.html")}">{x("nav_faq")}</a></li>
-          <li><a href="{h("reach.html")}">{x("nav_reach")}</a></li>
+          <li><a href="{h("admissions/faq.html")}">{x("nav_faq")}</a></li>
+          <li><a href="{h("about/reach.html")}">{x("nav_reach")}</a></li>
         </ul>
       </div>
       <div>
@@ -653,11 +657,11 @@ def event_albums() -> list[tuple[str, str, str, list[Path]]]:
 
 
 def album_page(slug: str) -> str:
-    return f"gallery-{slug}.html"
+    return f"gallery/{slug}.html"
 
 
 def event_album_page(slug: str) -> str:
-    return f"gallery-event-{slug}.html"
+    return f"gallery/events/{slug}.html"
 
 
 def gallery_slide_visual(site: Site, rel_dir: str, photos: list[Path], *, eager: bool) -> str:
@@ -756,9 +760,6 @@ def _write_album_page(site: Site, filename: str, heading: str, rel_dir: str, pho
 
 
 def write_gallery_albums(site: Site) -> None:
-    folder = ROOT / "hi" if site.lang == "hi" else ROOT
-    for old in folder.glob("gallery-*.html"):
-        old.unlink()
     for slug, label_key in GALLERY_ALBUMS:
         heading = site.tx(label_key)
         photos = album_photos(GALLERY_DIR / slug)
@@ -769,13 +770,6 @@ def write_gallery_albums(site: Site) -> None:
 
 
 def write_notice_pages(site: Site, items: list[dict]) -> None:
-    folder = ROOT / "hi" if site.lang == "hi" else ROOT
-    keep = {f"notice-{item['id']}" for item in items}
-    for old in folder.glob("notice-*.html"):
-        old.unlink()
-    for dest in folder.glob("notice-*"):
-        if dest.is_dir() and dest.name not in keep:
-            shutil.rmtree(dest)
     for item in items:
         slug = item["id"]
         heading = html.escape(notice_title(site, item))
@@ -809,16 +803,16 @@ def write_notice_pages(site: Site, items: list[dict]) -> None:
             body = f'        <p>{html.escape(site.tx("no_notices"))}</p>\n'
         main = (
             banner(heading)
-            + crumbs(site, ("notices.html", site.tx("nav_notices")), ("", notice_title(site, item)))
+            + crumbs(site, ("notices/board.html", site.tx("nav_notices")), ("", notice_title(site, item)))
             + story(
                 heading,
                 body
-                + f'        <p><a class="learn-more" href="{site.href("notices.html")}">{site.tx("all_notices")}</a></p>\n',
+                + f'        <p><a class="learn-more" href="{site.href("notices/board.html")}">{site.tx("all_notices")}</a></p>\n',
             )
         )
         write_page(
             site,
-            f"notice-{slug}.html",
+            f"notices/{slug}.html",
             f"{notice_title(site, item)} · {site.tx('brand')}",
             "notices",
             main,
@@ -828,6 +822,37 @@ def write_notice_pages(site: Site, items: list[dict]) -> None:
                 notice_summary(site, item) or site.tx("og_notice_fallback"),
             ),
         )
+
+
+LEGACY_PAGE_MAP = (
+    ("facilities.html", "about/facilities.html"),
+    ("reach.html", "about/reach.html"),
+    ("rules.html", "about/rules.html"),
+    ("school-life.html", "academics/school-life.html"),
+    ("faq.html", "admissions/faq.html"),
+    ("notices.html", "notices/board.html"),
+    ("notices-archive.html", "notices/archive.html"),
+)
+
+
+def write_pretty_and_stub_redirect(site: Site, old_filename: str, new_filename: str) -> None:
+    dest = public_path(site.lang, new_filename)
+    root = ROOT / "hi" if site.lang == "hi" else ROOT
+    write_html_redirect(root / old_filename, dest)
+    rel = pretty_rel(old_filename).strip("/")
+    if rel:
+        write_html_redirect(root / rel / "index.html", dest)
+
+
+def write_legacy_redirects(site: Site, items: list[dict]) -> None:
+    for old, new in LEGACY_PAGE_MAP:
+        write_pretty_and_stub_redirect(site, old, new)
+    for slug, _label in GALLERY_ALBUMS:
+        write_pretty_and_stub_redirect(site, f"gallery-{slug}.html", f"gallery/{slug}.html")
+    for slug, _title_en, _title_hi, _photos in event_albums():
+        write_pretty_and_stub_redirect(site, f"gallery-event-{slug}.html", f"gallery/events/{slug}.html")
+    for item in items:
+        write_pretty_and_stub_redirect(site, f"notice-{item['id']}.html", f"notices/{item['id']}.html")
 
 
 def parse_card_txt(path: Path) -> tuple[dict[str, str], dict[str, str]] | None:
@@ -867,11 +892,10 @@ def load_toppers() -> list[dict]:
             }
         )
     return items
-    return f'<a href="{site.href("results.html")}">{site.tx("nav_results")}</a>'
 
 
 def notices_link(site: Site, label: str) -> str:
-    return f'<a href="{site.href("notices.html")}">{label}</a>'
+    return f'<a href="{site.href("notices/board.html")}">{label}</a>'
 
 
 def req_mark(site: Site) -> str:
@@ -1188,9 +1212,9 @@ def build_lang(lang: str) -> None:
         </ul>
 """)
         + story(x("about_web"), f"""        <p>
-          <a class="learn-more" href="{h("facilities.html")}">{x("nav_facilities")}</a>
-          <a class="learn-more" href="{h("rules.html")}">{x("nav_rules")}</a>
-          <a class="learn-more" href="{h("reach.html")}">{x("nav_reach")}</a>
+          <a class="learn-more" href="{h("about/facilities.html")}">{x("nav_facilities")}</a>
+          <a class="learn-more" href="{h("about/rules.html")}">{x("nav_rules")}</a>
+          <a class="learn-more" href="{h("about/reach.html")}">{x("nav_reach")}</a>
         </p>
 """)
     )
@@ -1218,7 +1242,7 @@ def build_lang(lang: str) -> None:
           <li><strong>{x("acad_mid_3_title")}</strong><span>{x("acad_mid_3_text")}</span></li>
         </ul>
         <p>
-          <a class="learn-more" href="{h("school-life.html")}">{x("nav_life")}</a>
+          <a class="learn-more" href="{h("academics/school-life.html")}">{x("nav_life")}</a>
           <a class="learn-more" href="{h("admissions.html")}">{x("acad_seat")}</a>
         </p>
 """)
@@ -1236,8 +1260,8 @@ def build_lang(lang: str) -> None:
         </ul>
         <p>
           <a class="learn-more" href="{h("gallery.html")}">{x("nav_gallery")}</a>
-          <a class="learn-more" href="{h("facilities.html")}">{x("nav_facilities")}</a>
-          <a class="learn-more" href="{h("rules.html")}">{x("nav_rules")}</a>
+          <a class="learn-more" href="{h("about/facilities.html")}">{x("nav_facilities")}</a>
+          <a class="learn-more" href="{h("about/rules.html")}">{x("nav_rules")}</a>
         </p>
 """)
     )
@@ -1257,7 +1281,7 @@ def build_lang(lang: str) -> None:
         </ul>
         <p>
           <a class="learn-more" href="{h("contact.html")}">{x("ask_office")}</a>
-          <a class="learn-more" href="{h("reach.html")}">{x("nav_reach")}</a>
+          <a class="learn-more" href="{h("about/reach.html")}">{x("nav_reach")}</a>
         </p>
 """)
     )
@@ -1274,7 +1298,7 @@ def build_lang(lang: str) -> None:
           <li>{x("adm_step2")}</li>
           <li>{x("adm_step3")}</li>
         </ol>
-        <p><a class="learn-more" href="{h("faq.html")}">{x("adm_faq")}</a></p>
+        <p><a class="learn-more" href="{h("admissions/faq.html")}">{x("adm_faq")}</a></p>
 """)
         + story(
             x("adm_enquire"),
@@ -1328,7 +1352,7 @@ def build_lang(lang: str) -> None:
 
     notices_main = (
         banner(x("banner_notices"))
-        + crumbs(site, ("notices.html", x("nav_notices")), ("", x("nav_notices_board")))
+        + crumbs(site, ("notices/board.html", x("nav_notices")), ("", x("nav_notices_board")))
         + story(x("notices_from"), f"""        <p>{x("notices_p")}</p>
 """)
         + story(x("notices_latest"), f"""        <ul class="class-list">
@@ -1341,7 +1365,7 @@ def build_lang(lang: str) -> None:
         + story(
             x("notices_board"),
             f"""{notice_board_html(site, [item for item in items if item.get("stage") == "current"])}
-        <p><a class="learn-more" href="{h("notices-archive.html")}">{x("nav_notices_archive")}</a></p>
+        <p><a class="learn-more" href="{h("notices/archive.html")}">{x("nav_notices_archive")}</a></p>
 """,
             section_id="board",
         )
@@ -1351,7 +1375,7 @@ def build_lang(lang: str) -> None:
 
     notices_archive_main = (
         banner(x("banner_notices"))
-        + crumbs(site, ("notices.html", x("nav_notices")), ("", x("nav_notices_archive")))
+        + crumbs(site, ("notices/board.html", x("nav_notices")), ("", x("nav_notices_archive")))
         + story(
             x("notices_archive"),
             f"""        <p>{x("notices_archive_p")}</p>
@@ -1414,7 +1438,7 @@ def build_lang(lang: str) -> None:
           <li><strong>{x("rules_6_title")}</strong><span>{x("rules_6_text")}</span></li>
         </ul>
         <p>
-          <a class="learn-more" href="{h("notices.html")}">{x("nav_notices")}</a>
+          <a class="learn-more" href="{h("notices/board.html")}">{x("nav_notices")}</a>
           <a class="learn-more" href="{h("contact.html")}">{x("nav_contact")}</a>
         </p>
 """)
@@ -1651,20 +1675,21 @@ def build_lang(lang: str) -> None:
     write_page(site, "index.html", x("title_home"), "home", index_main, og_meta(site, x("title_home"), desc))
     write_page(site, "about.html", x("title_about"), "about", about_main, og_meta(site, x("og_about"), desc))
     write_page(site, "academics.html", x("title_academics"), "academics", academics_main, og_meta(site, x("og_academics"), desc))
-    write_page(site, "school-life.html", x("title_life"), "life", life_main, og_meta(site, x("og_life"), desc))
-    write_page(site, "facilities.html", x("title_facilities"), "facilities", facilities_main, og_meta(site, x("og_facilities"), desc))
+    write_page(site, "academics/school-life.html", x("title_life"), "life", life_main, og_meta(site, x("og_life"), desc))
+    write_page(site, "about/facilities.html", x("title_facilities"), "facilities", facilities_main, og_meta(site, x("og_facilities"), desc))
     write_page(site, "admissions.html", x("title_admissions"), "admissions", admissions_main, og_meta(site, x("og_admissions"), desc))
     write_page(site, "results.html", x("title_results"), "results", results_main, og_meta(site, x("og_results"), x("results_desc")))
-    write_page(site, "faq.html", x("title_faq"), "faq", faq_main, og_meta(site, x("og_faq"), desc))
-    write_page(site, "notices.html", x("title_notices"), "notices", notices_main, og_meta(site, x("og_notices"), desc))
-    write_page(site, "notices-archive.html", x("title_notices_archive"), "notices-archive", notices_archive_main, og_meta(site, x("og_notices"), desc))
+    write_page(site, "admissions/faq.html", x("title_faq"), "faq", faq_main, og_meta(site, x("og_faq"), desc))
+    write_page(site, "notices/board.html", x("title_notices"), "notices", notices_main, og_meta(site, x("og_notices"), desc))
+    write_page(site, "notices/archive.html", x("title_notices_archive"), "notices-archive", notices_archive_main, og_meta(site, x("og_notices"), desc))
     write_page(site, "gallery.html", x("title_gallery"), "gallery", gallery_main, og_meta(site, x("og_gallery"), desc))
     write_page(site, "careers.html", x("title_careers"), "careers", careers_main, og_meta(site, x("og_careers"), desc))
-    write_page(site, "reach.html", x("title_reach"), "reach", reach_main, og_meta(site, x("og_reach"), desc))
-    write_page(site, "rules.html", x("title_rules"), "rules", rules_main, og_meta(site, x("og_rules"), desc))
+    write_page(site, "about/reach.html", x("title_reach"), "reach", reach_main, og_meta(site, x("og_reach"), desc))
+    write_page(site, "about/rules.html", x("title_rules"), "rules", rules_main, og_meta(site, x("og_rules"), desc))
     write_page(site, "contact.html", x("title_contact"), "contact", contact_main, og_meta(site, x("og_contact"), desc))
     write_notice_pages(site, items)
     write_gallery_albums(site)
+    write_legacy_redirects(site, items)
 
 
 def write_publish_files() -> None:

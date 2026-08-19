@@ -49,7 +49,7 @@ Drop photos in `gallery/classrooms/` (and the other album folders). Programme al
 
 ## Toppers
 
-Drop a portrait and `card.txt` in `toppers/seedling/` (and the other class folders). See `toppers/README.md`.
+Drop a portrait and `card.txt` in `results/toppers/seedling/` (and the other class folders). See `results/toppers/README.md`.
 
 ## Brand
 

@@ -52,7 +52,7 @@ def main() -> None:
             to_webp(path, max_side, quality)
     for path in sorted((ROOT / "quotes").glob("*.png")):
         to_webp(path, 800, 74)
-    toppers = Path(__file__).resolve().parent / "toppers"
+    toppers = Path(__file__).resolve().parent / "results" / "toppers"
     if toppers.is_dir():
         for path in sorted(toppers.glob("*/photo.png")):
             to_webp(path, 700, 74)
