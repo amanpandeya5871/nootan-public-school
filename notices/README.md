@@ -22,6 +22,6 @@ Optional `date.txt` with `YYYY-MM-DD`. Otherwise the file date is used.
 
 ## Clock
 
-A notice appears on Home and the notice board from 2 days before the date through 1 week after, then only on Notice archive, then is removed after 6 months.
+A notice appears on Home and the notice board from 2 days before the date through 1 week after, then only on Notice archive, then is removed after 3 months (including across the year, e.g. November into February).
 
 Then run `python _build_pages.py` and push `main`.

@@ -28,6 +28,7 @@ NAGER_URL = "https://date.nager.at/api/v3/PublicHolidays/{year}/IN"
 
 CURRENT_BEFORE = 2
 CURRENT_AFTER = 7
+ARCHIVE_MONTHS = 3
 _CAL_CACHE: list[tuple[date, str]] | None = None
 _NOTICE_ITEMS: list[dict] | None = None
 
@@ -64,7 +65,7 @@ def add_months(day: date, months: int) -> date:
 def window_for(event_day: date, today: date) -> str | None:
     start = event_day - timedelta(days=CURRENT_BEFORE)
     current_end = event_day + timedelta(days=CURRENT_AFTER)
-    archive_end = add_months(event_day, 6)
+    archive_end = add_months(event_day, ARCHIVE_MONTHS)
     if today < start:
         return None
     if today <= current_end:

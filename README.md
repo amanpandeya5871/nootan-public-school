@@ -41,7 +41,7 @@ notices/
   festivals/{slug}/     optional override file
 ```
 
-See `notices/README.md`. A notice shows 2 days before the date through 1 week after, then on the archive page, then is removed after 6 months.
+See `notices/README.md`. A notice shows 2 days before the date through 1 week after, then on the archive page, then is removed after 3 months.
 
 ## Gallery
 

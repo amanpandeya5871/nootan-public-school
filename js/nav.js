@@ -353,7 +353,7 @@
     var today = startOfToday();
     var start = new Date(event.getFullYear(), event.getMonth(), event.getDate() - 2);
     var currentEnd = new Date(event.getFullYear(), event.getMonth(), event.getDate() + 7);
-    var archiveEnd = addMonths(event, 6);
+    var archiveEnd = addMonths(event, 3);
     if (today < start) return "soon";
     if (today <= currentEnd) return "current";
     if (today <= archiveEnd) return "archive";

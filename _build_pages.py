@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import html
 import json
+import shutil
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -564,7 +565,7 @@ def foot(site: Site) -> str:
     </div>
     <p class="legal">{x("legal")}</p>
   </footer>
-  <script src="{a("js/nav.js")}?v=20260819n"></script>
+  <script src="{a("js/nav.js")}?v=20260819o"></script>
 </body>
 </html>
 """
@@ -767,6 +768,12 @@ def write_gallery_albums(site: Site) -> None:
 
 
 def write_notice_pages(site: Site, items: list[dict]) -> None:
+    notices_root = ROOT / "hi" / "notices" if site.lang == "hi" else ROOT / "notices"
+    keep = {item["id"] for item in items} | {"board", "archive", "office", "festivals"}
+    if notices_root.is_dir():
+        for dest in notices_root.iterdir():
+            if dest.is_dir() and dest.name not in keep:
+                shutil.rmtree(dest)
     for item in items:
         slug = item["id"]
         heading = html.escape(notice_title(site, item))
