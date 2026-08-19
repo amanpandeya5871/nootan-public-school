@@ -30,20 +30,26 @@ python _build_pages.py
 
 ## Notices
 
-Office circulars live in a drop-in folder. The gold-top **boxes** on Home and Notices stay as they are; each whole box is a link.
+Festival and jayanti notices are automatic from `notices/events.csv` (dates from the India holiday calendar). Office circulars are drop-in:
 
 ```
 notices/
-  list.csv                 date,title,summary,file
-  files/independence-day.txt
-  files/ptm.txt
-  files/circulars-email.png
+  events.csv
+  office/ptm/
+  office/admit-cards/
+  office/results/
+  festivals/{slug}/     optional override file
 ```
 
-- `.txt` files open as text on `notice-<slug>.html`
-- `.jpg` / `.png` files open as an image on that page
+See `notices/README.md`. A notice shows 2 days before the date through 1 week after, then on the archive page, then is removed after 6 months.
 
-Replace the sample files, edit `list.csv`, then run `python _build_pages.py`. Treat a message from the office as the circular that counts.
+## Gallery
+
+Drop photos in `gallery/classrooms/` (and the other album folders). Programme albums go in `gallery/events/{name}/` with `title.txt`. See `gallery/README.md`.
+
+## Toppers
+
+Drop a portrait and `card.txt` in `toppers/seedling/` (and the other class folders). See `toppers/README.md`.
 
 ## Brand
 

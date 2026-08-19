@@ -325,6 +325,83 @@
     });
   });
 
+  function parseISODate(iso) {
+    var parts = String(iso || "").split("-");
+    if (parts.length !== 3) return null;
+    var year = Number(parts[0]);
+    var month = Number(parts[1]);
+    var day = Number(parts[2]);
+    if (!year || !month || !day) return null;
+    return new Date(year, month - 1, day);
+  }
+
+  function startOfToday() {
+    var now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  function addMonths(d, months) {
+    var copy = new Date(d.getFullYear(), d.getMonth() + months, 1);
+    var last = new Date(copy.getFullYear(), copy.getMonth() + 1, 0).getDate();
+    copy.setDate(Math.min(d.getDate(), last));
+    return copy;
+  }
+
+  function noticeStage(iso) {
+    var event = parseISODate(iso);
+    if (!event) return "gone";
+    var today = startOfToday();
+    var start = new Date(event.getFullYear(), event.getMonth(), event.getDate() - 2);
+    var currentEnd = new Date(event.getFullYear(), event.getMonth(), event.getDate() + 7);
+    var archiveEnd = addMonths(event, 6);
+    if (today < start) return "soon";
+    if (today <= currentEnd) return "current";
+    if (today <= archiveEnd) return "archive";
+    return "gone";
+  }
+
+  function noticeTense(iso) {
+    var event = parseISODate(iso);
+    if (!event) return "before";
+    var today = startOfToday();
+    if (today < event) return "before";
+    if (today.getTime() === event.getTime()) return "on";
+    return "after";
+  }
+
+  function applyNoticeTense(root, iso) {
+    if (!root || !iso) return;
+    var tense = noticeTense(iso);
+    root.querySelectorAll("[data-tense]").forEach(function (el) {
+      el.hidden = el.getAttribute("data-tense") !== tense;
+    });
+  }
+
+  document.querySelectorAll("[data-event-date]").forEach(function (el) {
+    applyNoticeTense(el, el.getAttribute("data-event-date"));
+  });
+
+  document.querySelectorAll("[data-notice-live]").forEach(function (root) {
+    var want = root.getAttribute("data-notice-live") || "current";
+    var cards = Array.from(root.querySelectorAll("a.notice[data-event-date]"));
+    var rows = Array.from(root.querySelectorAll("tr[data-notice][data-event-date]"));
+    var shown = 0;
+    cards.forEach(function (card) {
+      var ok = noticeStage(card.getAttribute("data-event-date")) === want;
+      card.hidden = !ok;
+      if (ok) shown += 1;
+    });
+    rows.forEach(function (row) {
+      var ok = noticeStage(row.getAttribute("data-event-date")) === want;
+      row.hidden = !ok;
+      if (ok) shown += 1;
+    });
+    var empty = root.querySelector(".notice-live-empty");
+    if (empty) empty.hidden = shown > 0;
+    var table = root.querySelector(".hours-table-wrap");
+    if (table && rows.length) table.hidden = shown === 0;
+  });
+
   document.querySelectorAll("[data-notice-board]").forEach(function (board) {
     var form = board.querySelector("[data-notice-filters]");
     if (!form) return;
@@ -339,6 +416,7 @@
       var cls = classSel ? classSel.value : "all";
       var cat = catSel ? catSel.value : "all";
       var q = search ? String(search.value || "").trim().toLowerCase() : "";
+      var live = board.getAttribute("data-notice-live") || "";
       var shown = 0;
       rows.forEach(function (row) {
         var ok = true;
@@ -346,6 +424,7 @@
         if (cls && cls !== "all" && classes.indexOf("all") < 0 && classes.indexOf(cls) < 0) ok = false;
         if (cat && cat !== "all" && row.getAttribute("data-category") !== cat) ok = false;
         if (q && String(row.getAttribute("data-search") || "").indexOf(q) < 0) ok = false;
+        if (live && noticeStage(row.getAttribute("data-event-date")) !== live) ok = false;
         row.hidden = !ok;
         if (ok) shown += 1;
       });

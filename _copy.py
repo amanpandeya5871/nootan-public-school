@@ -97,135 +97,30 @@ QUOTES = (
     },
 )
 
-TOPPERS = (
-    {
-        "class_key": "class_seedling",
-        "image": "assets/toppers/seedling.webp",
-        "name": {"en": "Aarav", "hi": "आरव"},
-        "quote": {
-            "en": "I like sitting in a circle and saying A, B, C. Didi claps when I finish my picture.",
-            "hi": "मुझे घेरे में बैठकर अ, आ बोलना अच्छा लगता है। दीदी तस्वीर पूरी होने पर ताली बजाती हैं।",
+NOTICE_TENSE = {
+    "observe": {
+        "en": {
+            "before": "The school will observe {title} on {date} on campus. Assembly time will be confirmed by the class teacher and the office.",
+            "on": "The school is observing {title} on campus today. Confirm assembly time at the office.",
+            "after": "The school observed {title} on {date}. For any follow-up, write to the office.",
+        },
+        "hi": {
+            "before": "विद्यालय {date} को परिसर में {title} मनाएगा। सभा का समय कक्षा-शिक्षक और कार्यालय से पुष्टि होगी।",
+            "on": "विद्यालय आज परिसर में {title} मना रहा है। सभा का समय कार्यालय से पुष्टि करें।",
+            "after": "विद्यालय ने {date} को {title} मनाया। आगे की जानकारी के लिए कार्यालय को लिखें।",
         },
     },
-    {
-        "class_key": "class_sapling",
-        "image": "assets/toppers/sapling.webp",
-        "name": {"en": "Vivaan", "hi": "विवान"},
-        "quote": {
-            "en": "I can write my name now. Maths is counting beads, and playtime is the best.",
-            "hi": "अब मैं अपना नाम लिख लेता हूँ। गणित में मनके गिनते हैं, और खेल का समय सबसे अच्छा है।",
+    "closed": {
+        "en": {
+            "before": "The school will remain closed for {title} on {date}. If the date changes, treat a message from the office as final.",
+            "on": "Holiday for {title}. The school is closed today.",
+            "after": "The school remained closed for {title} on {date}.",
         },
-    },
-    {
-        "class_key": "class_adv",
-        "image": "assets/toppers/adv.webp",
-        "name": {"en": "Advik", "hi": "अद्विक"},
-        "quote": {
-            "en": "Computer class is new. I like pressing the keys and watching the letters come on the screen.",
-            "hi": "कंप्यूटर की कक्षा नई है। मुझे बटन दबाना और स्क्रीन पर अक्षर आना अच्छा लगता है।",
+        "hi": {
+            "before": "{date} को {title} के कारण विद्यालय बंद रहेगा। तिथि बदले तो कार्यालय की सूचना अंतिम मानी जाए।",
+            "on": "{title} की छुट्टी है। विद्यालय आज बंद है।",
+            "after": "{title} के कारण विद्यालय {date} को बंद रहा।",
         },
-    },
-    {
-        "class_key": "class_1",
-        "image": "assets/toppers/class-1.webp",
-        "name": {"en": "Ananya", "hi": "अनन्या"},
-        "quote": {
-            "en": "I read small sentences in English and Hindi. I want my handwriting to stay neat.",
-            "hi": "मैं अंग्रेज़ी और हिंदी में छोटी पंक्तियाँ पढ़ती हूँ। मेरी लिखावट साफ़ रहे, यही चाहती हूँ।",
-        },
-    },
-    {
-        "class_key": "class_2",
-        "image": "assets/toppers/class-2.webp",
-        "name": {"en": "Kabir", "hi": "कबीर"},
-        "quote": {
-            "en": "Tables are hard at first, then they stay in my head. I like EVS because we talk about plants.",
-            "hi": "पहाड़े पहले कठिन लगते हैं, फिर याद रह जाते हैं। ईवीएस अच्छी लगती है क्योंकि हम पौधों की बात करते हैं।",
-        },
-    },
-    {
-        "class_key": "class_3",
-        "image": "assets/toppers/class-3.webp",
-        "name": {"en": "Ishaan", "hi": "ईशान"},
-        "quote": {
-            "en": "Story period is my favourite. If I read a little every day, the long words get easier.",
-            "hi": "कहानी की घड़ी सबसे प्यारी है। रोज़ थोड़ा पढ़ने से बड़े शब्द आसान हो जाते हैं।",
-        },
-    },
-    {
-        "class_key": "class_4",
-        "image": "assets/toppers/class-4.webp",
-        "name": {"en": "Anjali", "hi": "अंजलि"},
-        "quote": {
-            "en": "I try to finish my work in class so I can play. Hindi and Maths both need practice at home.",
-            "hi": "मैं कक्षा में काम पूरा करने की कोशिश करती हूँ, फिर खेलने मिलता है। हिंदी और गणित दोनों घर पर अभ्यास चाहते हैं।",
-        },
-    },
-    {
-        "class_key": "class_5",
-        "image": "assets/toppers/class-5.webp",
-        "name": {"en": "Rohan", "hi": "रोहन"},
-        "quote": {
-            "en": "I like computer and art. When I revise in the evening, the test feels fair, not sudden.",
-            "hi": "मुझे कंप्यूटर और कला अच्छे लगते हैं। शाम को दोहराव कर लूँ तो परीक्षा अचानक नहीं लगती।",
-        },
-    },
-    {
-        "class_key": "class_6",
-        "image": "assets/toppers/class-6.webp",
-        "name": {"en": "Harsh", "hi": "हर्ष"},
-        "quote": {
-            "en": "Science experiments stay with me. Sanskrit is new, but the shlokas are fun to say aloud.",
-            "hi": "विज्ञान के प्रयोग याद रह जाते हैं। संस्कृत नई है, पर श्लोक ज़ोर से बोलना मज़ेदार है।",
-        },
-    },
-    {
-        "class_key": "class_7",
-        "image": "assets/toppers/class-7.webp",
-        "name": {"en": "Aditya", "hi": "आदित्य"},
-        "quote": {
-            "en": "I keep a small timetable at home. Maps in social studies and Maths problems both need quiet time.",
-            "hi": "घर पर छोटी समय-सारिणी बनाता हूँ। सामाजिक अध्ययन के नक्शे और गणित के सवाल दोनों को शांत समय चाहिए।",
-        },
-    },
-    {
-        "class_key": "class_8",
-        "image": "assets/toppers/class-8.webp",
-        "name": {"en": "Priya", "hi": "प्रिया"},
-        "quote": {
-            "en": "This year I want to be ready for the next school. Teachers say practice every day, not only before the exam.",
-            "hi": "इस साल अगले विद्यालय के लिए तैयार रहना चाहती हूँ। शिक्षक कहते हैं रोज़ अभ्यास करो, केवल परीक्षा से पहले नहीं।",
-        },
-    },
-)
-
-NOTICE_HI = {
-    "independence-day.txt": {
-        "title": "स्वतंत्रता दिवस",
-        "summary": "विद्यालय परिसर में राष्ट्रीय पर्व मनाया जाता है। सभा का समय कार्यालय से पुष्टि करें।",
-        "body": (
-            "नूतन पब्लिक स्कूल, धरहरा परिसर में स्वतंत्रता दिवस मनाता है।\n\n"
-            "सभा का समय और दिनचर्या में कोई परिवर्तन कक्षा-शिक्षक तथा कार्यालय द्वारा सूचित किया जाता है। "
-            "परिवारों से अनुरोध है कि कार्यालय से प्राप्त सूचना को अंतिम मानें।\n\n"
-            "ईमेल पर परिपत्र पाने के लिए npsd1970@gmail.com पर लिखें।\n\n"
-            "शैक्षणिक सत्र {year}।"
-        ),
-    },
-    "ptm.txt": {
-        "title": "अभिभावक–शिक्षक बैठक",
-        "summary": "तिथि कक्षा-शिक्षक भेजते हैं। परिपत्र चाहिए तो कार्यालय को ईमेल करें।",
-        "body": (
-            "अभिभावक–शिक्षक बैठक की तिथि और समय कक्षा-शिक्षक सूचित करते हैं।\n\n"
-            "यदि परिपत्र न मिले तो npsd1970@gmail.com पर लिखें या धरहरा स्थित कार्यालय से संपर्क करें। "
-            "यह पृष्ठ बुकिंग फॉर्म नहीं है।\n\n"
-            "कृपया सार्वजनिक फॉर्म के माध्यम से बच्चों के फोटो या पहचान पत्र न भेजें।\n\n"
-            "शैक्षणिक सत्र {year}।"
-        ),
-    },
-    "circulars-email.png": {
-        "title": "परिपत्र कैसे पहुँचते हैं",
-        "summary": "कार्यालय की ईमेल सूची में नाम लिखवाएँ: npsd1970@gmail.com।",
-        "body": "",
     },
 }
 
@@ -693,6 +588,7 @@ UI = {
         "toppers_p": "After each examination the school honours class-wise distinction — a portrait and a short word, shared with the family’s consent.",
         "topper_photo": "Portrait",
         "topper_said": "In their words",
+        "class_play": "Play (Pre-Nursery)",
         "class_seedling": "Seedling",
         "class_sapling": "Sapling",
         "class_adv": "Advanced Sapling",
@@ -1206,6 +1102,7 @@ UI = {
         "toppers_p": "प्रत्येक परीक्षा के बाद विद्यालय कक्षावार उत्कृष्टता का सम्मान करता है — एक चित्र और संक्षिप्त वचन, परिवार की सहमति से।",
         "topper_photo": "चित्र",
         "topper_said": "उनके शब्द",
+        "class_play": "प्ले (प्री-नर्सरी)",
         "class_seedling": "सीडलिंग",
         "class_sapling": "सैपलिंग",
         "class_adv": "एडवांस्ड सैपलिंग",

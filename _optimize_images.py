@@ -50,9 +50,12 @@ def main() -> None:
         path = ROOT / name
         if path.exists():
             to_webp(path, max_side, quality)
-    for folder, max_side, quality in (("quotes", 800, 74), ("toppers", 700, 74)):
-        for path in sorted((ROOT / folder).glob("*.png")):
-            to_webp(path, max_side, quality)
+    for path in sorted((ROOT / "quotes").glob("*.png")):
+        to_webp(path, 800, 74)
+    toppers = Path(__file__).resolve().parent / "toppers"
+    if toppers.is_dir():
+        for path in sorted(toppers.glob("*/photo.png")):
+            to_webp(path, 700, 74)
 
     crest = Image.open(ROOT / "npsd-crest.png").convert("RGBA")
     fav = fit(crest, 48)

@@ -1,7 +1,6 @@
 """One-shot HTML builder for the public school site. Run from school-website/."""
 from __future__ import annotations
 
-import csv
 import html
 import json
 import shutil
@@ -10,7 +9,8 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote
 
-from _copy import NOTICE_HI, QUOTES, TOPPERS, academic_year, t
+from _copy import NOTICE_TENSE, QUOTES, academic_year, t
+from _notices import build_notice_items
 from _write_icons import write_icons
 
 ROOT = Path(__file__).resolve().parent
@@ -22,9 +22,23 @@ MAIL = "https://mail.google.com/mail/?view=cm&fs=1&to=npsd1970@gmail.com"
 RESULTS_URL = "https://npsdharhararesults.streamlit.app/"
 MAPS_URL = "https://maps.app.goo.gl/nQ6PKQLJfarx8TYy7?g_st=ig"
 NOTICES_DIR = ROOT / "notices"
-NOTICES_FILES = NOTICES_DIR / "files"
 IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 GALLERY_DIR = ROOT / "gallery"
+TOPPERS_DIR = ROOT / "toppers"
+TOPPER_CLASSES = (
+    ("play", "class_play"),
+    ("seedling", "class_seedling"),
+    ("sapling", "class_sapling"),
+    ("adv", "class_adv"),
+    ("class-1", "class_1"),
+    ("class-2", "class_2"),
+    ("class-3", "class_3"),
+    ("class-4", "class_4"),
+    ("class-5", "class_5"),
+    ("class-6", "class_6"),
+    ("class-7", "class_7"),
+    ("class-8", "class_8"),
+)
 GALLERY_ALBUMS = (
     ("classrooms", "gal_1"),
     ("playground", "gal_2"),
@@ -144,55 +158,66 @@ def slug_from_file(filename: str) -> str:
     return Path(filename).stem
 
 
-def load_notices() -> list[dict[str, str]]:
-    path = NOTICES_DIR / "list.csv"
-    if not path.exists():
-        return []
-    with path.open(encoding="utf-8", newline="") as handle:
-        rows = list(csv.DictReader(handle))
-    items: list[dict[str, str]] = []
-    for row in rows:
-        file_name = (row.get("file") or "").strip()
-        if not file_name:
-            continue
-        items.append(
-            {
-                "date": (row.get("date") or "").strip(),
-                "title": (row.get("title") or "").strip(),
-                "summary": (row.get("summary") or "").strip(),
-                "file": file_name,
-                "category": (row.get("category") or "administrative").strip() or "administrative",
-                "classes": (row.get("classes") or "all").strip() or "all",
-            }
-        )
-    items.sort(key=lambda item: item["date"], reverse=True)
-    return items
+def load_notices() -> list[dict]:
+    return build_notice_items()
 
 
-def notice_title(site: Site, item: dict[str, str]) -> str:
-    if site.lang == "hi" and item["file"] in NOTICE_HI:
-        return NOTICE_HI[item["file"]]["title"]
-    return item["title"]
+def notice_title(site: Site, item: dict) -> str:
+    return item["title_hi"] if site.lang == "hi" else item["title_en"]
 
 
-def notice_summary(site: Site, item: dict[str, str]) -> str:
-    if site.lang == "hi" and item["file"] in NOTICE_HI:
-        return NOTICE_HI[item["file"]]["summary"]
-    return item["summary"]
+def notice_tense_lines(site: Site, item: dict) -> dict[str, str] | None:
+    kind = item.get("kind") or ""
+    if kind not in NOTICE_TENSE:
+        return None
+    pack = NOTICE_TENSE[kind][site.lang]
+    title = notice_title(site, item)
+    day = format_date(item["date"])
+    return {key: pack[key].format(title=title, date=day) for key in ("before", "on", "after")}
+
+
+def office_plain_text(path: str) -> str:
+    file_path = Path(path)
+    if not file_path.exists() or file_path.suffix.lower() in IMAGE_EXT:
+        return ""
+    return file_path.read_text(encoding="utf-8").strip()
+
+
+def notice_summary(site: Site, item: dict) -> str:
+    lines = notice_tense_lines(site, item)
+    if lines:
+        return lines["before"]
+    override = item.get("override") or ""
+    if override:
+        text = office_plain_text(override)
+        if text:
+            return text.split("\n\n")[0].replace("\n", " ")
+        return notice_title(site, item)
+    return notice_title(site, item)
 
 
 def notice_cards(site: Site, items: list[dict[str, str]]) -> str:
     bits: list[str] = []
     for item in items:
-        href = site.href(f"notice-{slug_from_file(item['file'])}.html")
+        href = site.href(f"notice-{item['id']}.html")
+        lines = notice_tense_lines(site, item)
+        if lines:
+            body = (
+                f'            <p data-tense="before">{html.escape(lines["before"])}</p>\n'
+                f'            <p data-tense="on" hidden>{html.escape(lines["on"])}</p>\n'
+                f'            <p data-tense="after" hidden>{html.escape(lines["after"])}</p>'
+            )
+        else:
+            body = f'            <p>{html.escape(notice_summary(site, item))}</p>'
         bits.append(
-            f"""          <a class="notice" href="{html.escape(href, quote=True)}">
+            f"""          <a class="notice" href="{html.escape(href, quote=True)}" data-event-date="{html.escape(item['date'], quote=True)}" data-notice-kind="{html.escape(item.get('kind') or '', quote=True)}">
             <time datetime="{html.escape(item['date'], quote=True)}">{html.escape(format_date(item['date']))}</time>
             <h3>{html.escape(notice_title(site, item))}</h3>
-            <p>{html.escape(notice_summary(site, item))}</p>
+{body}
           </a>"""
         )
-    return "\n".join(bits) if bits else f'          <p class="prose">{site.tx("no_notices")}</p>'
+    empty = f'          <p class="prose notice-live-empty" hidden>{site.tx("no_notices")}</p>'
+    return ("\n".join(bits) + "\n" + empty) if bits else f'          <p class="prose">{site.tx("no_notices")}</p>'
 
 
 def notice_category_label(site: Site, category: str) -> str:
@@ -207,15 +232,24 @@ def notice_board_html(site: Site, items: list[dict[str, str]], *, filters: bool 
     x = site.tx
     rows: list[str] = []
     for item in items:
-        href = site.href(f"notice-{slug_from_file(item['file'])}.html")
+        href = site.href(f"notice-{item['id']}.html")
         title = notice_title(site, item)
-        summary = notice_summary(site, item)
+        lines = notice_tense_lines(site, item)
+        summary = lines["before"] if lines else notice_summary(site, item)
         category = item.get("category") or "administrative"
         classes = item.get("classes") or "all"
         cat_label = notice_category_label(site, category)
         search = " ".join((title, summary, cat_label)).lower()
+        if lines:
+            summary_html = (
+                f'<span class="notice-table-summary" data-tense="before">{html.escape(lines["before"])}</span>'
+                f'<span class="notice-table-summary" data-tense="on" hidden>{html.escape(lines["on"])}</span>'
+                f'<span class="notice-table-summary" data-tense="after" hidden>{html.escape(lines["after"])}</span>'
+            )
+        else:
+            summary_html = f'<span class="notice-table-summary">{html.escape(summary)}</span>'
         rows.append(
-            f"""            <tr data-notice data-category="{html.escape(category, quote=True)}" data-classes="{html.escape(classes, quote=True)}" data-search="{html.escape(search, quote=True)}">
+            f"""            <tr data-notice data-event-date="{html.escape(item['date'], quote=True)}" data-notice-kind="{html.escape(item.get('kind') or '', quote=True)}" data-category="{html.escape(category, quote=True)}" data-classes="{html.escape(classes, quote=True)}" data-search="{html.escape(search, quote=True)}">
               <td>
                 <span class="notice-status">{x("notices_status_active")}</span>
                 <time datetime="{html.escape(item["date"], quote=True)}">{html.escape(format_date(item["date"]))}</time>
@@ -223,7 +257,7 @@ def notice_board_html(site: Site, items: list[dict[str, str]], *, filters: bool 
               <td>{html.escape(cat_label)}</td>
               <td>
                 <a href="{html.escape(href, quote=True)}">{html.escape(title)}</a>
-                <span class="notice-table-summary">{html.escape(summary)}</span>
+                {summary_html}
               </td>
               <td><a class="notice-action" href="{html.escape(href, quote=True)}">{x("notices_view")}</a></td>
             </tr>"""
@@ -269,7 +303,7 @@ def notice_board_html(site: Site, items: list[dict[str, str]], *, filters: bool 
         </form>
         <p class="notice-filter-empty" hidden>{x("notices_none_filter")}</p>
 """
-    return f"""        <div class="notice-board" data-notice-board>
+    return f"""        <div class="notice-board" data-notice-board data-notice-live="{'archive' if filters else 'current'}">
 {filter_bar}        <div class="hours-table-wrap">
           <table class="hours-table notice-table">
             <thead>
@@ -526,7 +560,7 @@ def foot(site: Site) -> str:
     </div>
     <p class="legal">{x("legal")}</p>
   </footer>
-  <script src="{a("js/nav.js")}?v=20260818u"></script>
+  <script src="{a("js/nav.js")}?v=20260819n"></script>
 </body>
 </html>
 """
@@ -569,12 +603,14 @@ def notice_para(text: str, lang: str) -> str:
     return escaped.replace(year_esc, f'<span data-session-year>{year_esc}</span>')
 
 
-def album_photos(slug: str) -> list[Path]:
-    folder = GALLERY_DIR / slug
-    folder.mkdir(parents=True, exist_ok=True)
-    keep = folder / ".gitkeep"
-    if not keep.exists():
-        keep.write_text("", encoding="utf-8")
+def album_photos(folder: Path, *, ensure: bool = True) -> list[Path]:
+    if ensure:
+        folder.mkdir(parents=True, exist_ok=True)
+        keep = folder / ".gitkeep"
+        if not keep.exists():
+            keep.write_text("", encoding="utf-8")
+    if not folder.is_dir():
+        return []
     return sorted(
         (
             path
@@ -587,14 +623,47 @@ def album_photos(slug: str) -> list[Path]:
     )
 
 
+def read_title_file(path: Path) -> tuple[str, str] | None:
+    if not path.exists():
+        return None
+    lines = [line.strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    if not lines:
+        return None
+    english = lines[0]
+    hindi = lines[1] if len(lines) > 1 else english
+    return english, hindi
+
+
+def event_albums() -> list[tuple[str, str, str, list[Path]]]:
+    root = GALLERY_DIR / "events"
+    root.mkdir(parents=True, exist_ok=True)
+    keep = root / ".gitkeep"
+    if not keep.exists():
+        keep.write_text("", encoding="utf-8")
+    found: list[tuple[str, str, str, list[Path]]] = []
+    for folder in sorted(root.iterdir(), key=lambda path: path.name.lower(), reverse=True):
+        if not folder.is_dir() or folder.name.startswith("."):
+            continue
+        titles = read_title_file(folder / "title.txt")
+        photos = album_photos(folder, ensure=False)
+        if not titles or not photos:
+            continue
+        found.append((folder.name, titles[0], titles[1], photos))
+    return found
+
+
 def album_page(slug: str) -> str:
     return f"gallery-{slug}.html"
 
 
-def gallery_slide_visual(site: Site, slug: str, photos: list[Path], *, eager: bool) -> str:
+def event_album_page(slug: str) -> str:
+    return f"gallery-event-{slug}.html"
+
+
+def gallery_slide_visual(site: Site, rel_dir: str, photos: list[Path], *, eager: bool) -> str:
     if not photos:
         return '              <div class="gallery-slide-visual gallery-slide-ph" aria-hidden="true"></div>'
-    src = html.escape(site.asset(f"gallery/{slug}/{photos[0].name}"), quote=True)
+    src = html.escape(site.asset(f"{rel_dir}/{photos[0].name}"), quote=True)
     loading = "" if eager else ' loading="lazy"'
     return (
         f'              <img class="gallery-slide-visual" src="{src}" alt="" '
@@ -602,26 +671,37 @@ def gallery_slide_visual(site: Site, slug: str, photos: list[Path], *, eager: bo
     )
 
 
-def gallery_index_html(site: Site) -> str:
-    slides: list[str] = []
-    jumps: list[str] = []
-    for index, (slug, label_key) in enumerate(GALLERY_ALBUMS):
-        photos = album_photos(slug)
-        label = html.escape(site.tx(label_key))
-        href = html.escape(site.href(album_page(slug)), quote=True)
-        active = " is-active" if index == 0 else ""
-        visual = gallery_slide_visual(site, slug, photos, eager=index == 0)
-        slides.append(
-            f"""            <a class="gallery-slide{active}" href="{href}">
+def _gallery_slide(site: Site, href: str, label: str, visual: str, *, active: bool) -> str:
+    flag = " is-active" if active else ""
+    return f"""            <a class="gallery-slide{flag}" href="{html.escape(href, quote=True)}">
 {visual}
               <div class="gallery-slide-copy">
                 <p class="gallery-slide-kicker">{html.escape(site.tx("nav_gallery"))}</p>
-                <h3>{label}</h3>
+                <h3>{html.escape(label)}</h3>
                 <p class="gallery-slide-more">{html.escape(site.tx("gal_view"))}</p>
               </div>
             </a>"""
-        )
-        jumps.append(f'          <a href="{href}">{label}</a>')
+
+
+def gallery_index_html(site: Site) -> str:
+    slides: list[str] = []
+    jumps: list[str] = []
+    index = 0
+    for slug, label_key in GALLERY_ALBUMS:
+        photos = album_photos(GALLERY_DIR / slug)
+        label = site.tx(label_key)
+        href = site.href(album_page(slug))
+        visual = gallery_slide_visual(site, f"gallery/{slug}", photos, eager=index == 0)
+        slides.append(_gallery_slide(site, href, label, visual, active=index == 0))
+        jumps.append(f'          <a href="{html.escape(href, quote=True)}">{html.escape(label)}</a>')
+        index += 1
+    for slug, title_en, title_hi, photos in event_albums():
+        label = title_hi if site.lang == "hi" else title_en
+        href = site.href(event_album_page(slug))
+        visual = gallery_slide_visual(site, f"gallery/events/{slug}", photos, eager=index == 0)
+        slides.append(_gallery_slide(site, href, label, visual, active=index == 0))
+        jumps.append(f'          <a href="{html.escape(href, quote=True)}">{html.escape(label)}</a>')
+        index += 1
     return (
         '        <div class="gallery-carousel" data-gallery-carousel>\n'
         + "\n".join(slides)
@@ -632,11 +712,11 @@ def gallery_index_html(site: Site) -> str:
     )
 
 
-def album_carousel_html(site: Site, slug: str, heading: str, photos: list[Path]) -> str:
+def album_carousel_html(site: Site, rel_dir: str, heading: str, photos: list[Path]) -> str:
     slides: list[str] = []
     for index, path in enumerate(photos):
         active = " is-active" if index == 0 else ""
-        src = html.escape(site.asset(f"gallery/{slug}/{path.name}"), quote=True)
+        src = html.escape(site.asset(f"{rel_dir}/{path.name}"), quote=True)
         loading = "" if index == 0 else ' loading="lazy"'
         alt = html.escape(heading, quote=True)
         slides.append(
@@ -651,73 +731,82 @@ def album_carousel_html(site: Site, slug: str, heading: str, photos: list[Path])
     )
 
 
+def _write_album_page(site: Site, filename: str, heading: str, rel_dir: str, photos: list[Path]) -> None:
+    if photos:
+        body = album_carousel_html(site, rel_dir, heading, photos)
+    else:
+        body = f'        <p class="gallery-empty">{html.escape(site.tx("gal_empty"))}</p>\n'
+    main = (
+        banner(html.escape(heading))
+        + crumbs(site, ("gallery.html", site.tx("nav_gallery")), ("", heading))
+        + story(
+            html.escape(heading),
+            body
+            + f'        <p><a class="learn-more" href="{site.href("gallery.html")}">{site.tx("gal_all")}</a></p>\n',
+        )
+    )
+    write_page(
+        site,
+        filename,
+        f"{heading} · {site.tx('title_gallery')}",
+        "gallery",
+        main,
+        og_meta(site, f"{heading} · NPS Dharhara", site.tx("gal_p")),
+    )
+
+
 def write_gallery_albums(site: Site) -> None:
     folder = ROOT / "hi" if site.lang == "hi" else ROOT
     for old in folder.glob("gallery-*.html"):
         old.unlink()
     for slug, label_key in GALLERY_ALBUMS:
         heading = site.tx(label_key)
-        photos = album_photos(slug)
-        if photos:
-            body = album_carousel_html(site, slug, heading, photos)
-        else:
-            body = f'        <p class="gallery-empty">{html.escape(site.tx("gal_empty"))}</p>\n'
-        main = (
-            banner(html.escape(heading))
-            + crumbs(site, ("gallery.html", site.tx("nav_gallery")), ("", heading))
-            + story(
-                html.escape(heading),
-                body
-                + f'        <p><a class="learn-more" href="{site.href("gallery.html")}">{site.tx("gal_all")}</a></p>\n',
-            )
-        )
-        write_page(
-            site,
-            album_page(slug),
-            f"{heading} · {site.tx('title_gallery')}",
-            "gallery",
-            main,
-            og_meta(site, f"{heading} · NPS Dharhara", site.tx("gal_p")),
-        )
+        photos = album_photos(GALLERY_DIR / slug)
+        _write_album_page(site, album_page(slug), heading, f"gallery/{slug}", photos)
+    for slug, title_en, title_hi, photos in event_albums():
+        heading = title_hi if site.lang == "hi" else title_en
+        _write_album_page(site, event_album_page(slug), heading, f"gallery/events/{slug}", photos)
 
 
-def write_notice_pages(site: Site, items: list[dict[str, str]]) -> None:
+def write_notice_pages(site: Site, items: list[dict]) -> None:
     folder = ROOT / "hi" if site.lang == "hi" else ROOT
+    keep = {f"notice-{item['id']}" for item in items}
     for old in folder.glob("notice-*.html"):
         old.unlink()
+    for dest in folder.glob("notice-*"):
+        if dest.is_dir() and dest.name not in keep:
+            shutil.rmtree(dest)
     for item in items:
-        src = NOTICES_FILES / item["file"]
-        slug = slug_from_file(item["file"])
-        ext = Path(item["file"]).suffix.lower()
+        slug = item["id"]
         heading = html.escape(notice_title(site, item))
         date_line = html.escape(format_date(item["date"]))
-        hi_body = NOTICE_HI.get(item["file"], {}).get("body") if site.lang == "hi" else ""
-        if not src.exists():
-            body = f'        <p>{html.escape(site.tx("no_notices"))}</p>\n'
-        elif hi_body:
-            paras = "".join(
-                f"        <p>{notice_para(chunk.strip(), site.lang)}</p>\n"
-                for chunk in hi_body.split("\n\n")
-                if chunk.strip()
-            )
-            body = f'        <p class="notice-date">{date_line} · {html.escape(site.tx("notice_circular"))}</p>\n{paras}'
-        elif ext in IMAGE_EXT:
-            dest = ROOT / "notices" / "files" / item["file"]
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            if src.resolve() != dest.resolve():
-                shutil.copy2(src, dest)
+        override = Path(item["override"]) if item.get("override") else None
+        lines = notice_tense_lines(site, item)
+        head_date = f'        <p class="notice-date">{date_line} · {html.escape(site.tx("notice_circular"))}</p>\n'
+        if override and override.exists() and override.suffix.lower() in IMAGE_EXT:
+            rel = override.relative_to(ROOT).as_posix()
             body = (
-                f'        <p class="notice-date">{date_line} · {html.escape(site.tx("notice_circular"))}</p>\n'
-                f'        <img class="notice-image" src="{html.escape(site.asset("notices/files/" + item["file"]), quote=True)}" alt="{heading}" decoding="async" />\n'
+                head_date
+                + f'        <img class="notice-image" src="{html.escape(site.asset(rel), quote=True)}" alt="{heading}" decoding="async" />\n'
             )
-        else:
-            raw = src.read_text(encoding="utf-8").strip()
+        elif override and override.exists() and override.suffix.lower() == ".txt":
+            raw = override.read_text(encoding="utf-8").strip()
             paras = "".join(
                 f"        <p>{notice_para(chunk.strip(), site.lang)}</p>\n"
                 for chunk in raw.split("\n\n")
                 if chunk.strip()
             )
-            body = f'        <p class="notice-date">{date_line} · {html.escape(site.tx("notice_circular"))}</p>\n{paras}'
+            body = head_date + paras
+        elif lines:
+            body = head_date + (
+                f'        <div data-event-date="{html.escape(item["date"], quote=True)}" data-notice-kind="{html.escape(item.get("kind") or "", quote=True)}">\n'
+                f'        <p data-tense="before">{html.escape(lines["before"])}</p>\n'
+                f'        <p data-tense="on" hidden>{html.escape(lines["on"])}</p>\n'
+                f'        <p data-tense="after" hidden>{html.escape(lines["after"])}</p>\n'
+                f"        </div>\n"
+            )
+        else:
+            body = f'        <p>{html.escape(site.tx("no_notices"))}</p>\n'
         main = (
             banner(heading)
             + crumbs(site, ("notices.html", site.tx("nav_notices")), ("", notice_title(site, item)))
@@ -730,7 +819,7 @@ def write_notice_pages(site: Site, items: list[dict[str, str]]) -> None:
         write_page(
             site,
             f"notice-{slug}.html",
-            f"{notice_title(site, item)} · {site.tx("brand")}",
+            f"{notice_title(site, item)} · {site.tx('brand')}",
             "notices",
             main,
             og_meta(
@@ -741,7 +830,43 @@ def write_notice_pages(site: Site, items: list[dict[str, str]]) -> None:
         )
 
 
-def results_link(site: Site) -> str:
+def parse_card_txt(path: Path) -> tuple[dict[str, str], dict[str, str]] | None:
+    if not path.exists():
+        return None
+    raw = path.read_text(encoding="utf-8").strip()
+    if not raw:
+        return None
+    lines = [line.rstrip() for line in raw.splitlines()]
+    name_en = (lines[0] if lines else "").strip()
+    name_hi = (lines[1] if len(lines) > 1 else name_en).strip() or name_en
+    rest = "\n".join(lines[2:]).strip()
+    parts = [chunk.strip() for chunk in rest.split("\n\n") if chunk.strip()]
+    quote_en = parts[0] if parts else ""
+    quote_hi = parts[1] if len(parts) > 1 else quote_en
+    if not name_en or not quote_en:
+        return None
+    return {"en": name_en, "hi": name_hi}, {"en": quote_en, "hi": quote_hi}
+
+
+def load_toppers() -> list[dict]:
+    items: list[dict] = []
+    for slug, class_key in TOPPER_CLASSES:
+        folder = TOPPERS_DIR / slug
+        photos = album_photos(folder, ensure=True)
+        parsed = parse_card_txt(folder / "card.txt")
+        if not photos or not parsed:
+            continue
+        names, quotes = parsed
+        rel = photos[0].relative_to(ROOT).as_posix()
+        items.append(
+            {
+                "class_key": class_key,
+                "image": rel,
+                "name": names,
+                "quote": quotes,
+            }
+        )
+    return items
     return f'<a href="{site.href("results.html")}">{site.tx("nav_results")}</a>'
 
 
@@ -936,7 +1061,7 @@ def build_lang(lang: str) -> None:
     h = site.href
     a = site.asset
     items = load_notices()
-    home_cards = notice_cards(site, items[:3])
+    home_cards = notice_cards(site, [item for item in items if item.get("stage") == "current"])
 
     index_main = f"""  <main id="main">
     <section class="hero hero-welcome">
@@ -1014,7 +1139,7 @@ def build_lang(lang: str) -> None:
       </div>
     </section>
 
-    <section class="notices">
+    <section class="notices" data-notice-live="current">
       <div class="wrap">
         <p class="section-label">{x("home_notices_label")}</p>
         <h2 class="section-title">{x("home_notices_title")}</h2>
@@ -1215,7 +1340,7 @@ def build_lang(lang: str) -> None:
 """)
         + story(
             x("notices_board"),
-            f"""{notice_board_html(site, items)}
+            f"""{notice_board_html(site, [item for item in items if item.get("stage") == "current"])}
         <p><a class="learn-more" href="{h("notices-archive.html")}">{x("nav_notices_archive")}</a></p>
 """,
             section_id="board",
@@ -1230,7 +1355,7 @@ def build_lang(lang: str) -> None:
         + story(
             x("notices_archive"),
             f"""        <p>{x("notices_archive_p")}</p>
-{notice_board_html(site, items, filters=True)}
+{notice_board_html(site, [item for item in items if item.get("stage") == "archive"], filters=True)}
 """,
         )
         + story(x("notices_urgent_label"), f"""        <p class="notice-urgent">{x("notices_urgent")}</p>
@@ -1469,6 +1594,7 @@ def build_lang(lang: str) -> None:
         )
     )
 
+    toppers = load_toppers()
     topper_cards = "\n".join(
         f"""          <article class="topper-card{' is-active' if i == 0 else ''}">
             <div class="topper-photo">
@@ -1481,7 +1607,7 @@ def build_lang(lang: str) -> None:
               <p class="topper-name">— {html.escape(item["name"][site.lang])}</p>
             </div>
           </article>"""
-        for i, item in enumerate(TOPPERS)
+        for i, item in enumerate(toppers)
     )
     results_main = (
         banner(x("banner_results"))
