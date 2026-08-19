@@ -2002,7 +2002,7 @@ a.gallery-slot:focus-visible {
   pointer-events: none;
   transform: scale(1.08);
   clip-path: inset(42%);
-  transition: opacity 1.2s ease, transform 1.2s ease, clip-path 1.2s ease;
+  transition: opacity 1.5s ease, transform 1.5s ease, clip-path 1.5s ease;
   background: var(--cream);
   padding: 0;
   border: 0;
