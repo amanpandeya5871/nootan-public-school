@@ -577,9 +577,6 @@ def write_page(site: Site, filename: str, title: str, current: str, main: str, m
     site.out_path(filename).write_text(html_out, encoding="utf-8")
     dest = public_path(site.lang, filename)
     SITEMAP_URLS.append(SITE_URL + dest)
-    if filename != "index.html":
-        stub_dir = ROOT / "hi" if site.lang == "hi" else ROOT
-        write_html_redirect(stub_dir / filename, dest)
 
 
 def banner(heading: str) -> str:
@@ -824,35 +821,10 @@ def write_notice_pages(site: Site, items: list[dict]) -> None:
         )
 
 
-LEGACY_PAGE_MAP = (
-    ("facilities.html", "about/facilities.html"),
-    ("reach.html", "about/reach.html"),
-    ("rules.html", "about/rules.html"),
-    ("school-life.html", "academics/school-life.html"),
-    ("faq.html", "admissions/faq.html"),
-    ("notices.html", "notices/board.html"),
-    ("notices-archive.html", "notices/archive.html"),
-)
-
-
-def write_pretty_and_stub_redirect(site: Site, old_filename: str, new_filename: str) -> None:
-    dest = public_path(site.lang, new_filename)
+def write_notices_hub_redirect(site: Site) -> None:
+    dest = public_path(site.lang, "notices/board.html")
     root = ROOT / "hi" if site.lang == "hi" else ROOT
-    write_html_redirect(root / old_filename, dest)
-    rel = pretty_rel(old_filename).strip("/")
-    if rel:
-        write_html_redirect(root / rel / "index.html", dest)
-
-
-def write_legacy_redirects(site: Site, items: list[dict]) -> None:
-    for old, new in LEGACY_PAGE_MAP:
-        write_pretty_and_stub_redirect(site, old, new)
-    for slug, _label in GALLERY_ALBUMS:
-        write_pretty_and_stub_redirect(site, f"gallery-{slug}.html", f"gallery/{slug}.html")
-    for slug, _title_en, _title_hi, _photos in event_albums():
-        write_pretty_and_stub_redirect(site, f"gallery-event-{slug}.html", f"gallery/events/{slug}.html")
-    for item in items:
-        write_pretty_and_stub_redirect(site, f"notice-{item['id']}.html", f"notices/{item['id']}.html")
+    write_html_redirect(root / "notices" / "index.html", dest)
 
 
 def parse_card_txt(path: Path) -> tuple[dict[str, str], dict[str, str]] | None:
@@ -1689,7 +1661,7 @@ def build_lang(lang: str) -> None:
     write_page(site, "contact.html", x("title_contact"), "contact", contact_main, og_meta(site, x("og_contact"), desc))
     write_notice_pages(site, items)
     write_gallery_albums(site)
-    write_legacy_redirects(site, items)
+    write_notices_hub_redirect(site)
 
 
 def write_publish_files() -> None:
